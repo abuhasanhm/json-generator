@@ -1,0 +1,345 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Masjid JSON Generator — (style match Jam Masjid)</title>
+<style>
+:root{--bg:#0b1220;--panel:#0f1a2e;--muted:#98a5c0;--text:#e9f1ff;--brand:#38bdf8;--green:#10b981;--blue:#3b82f6;--orange:#f59e0b;--line:#ffffff18;--radius:16px}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Roboto,Arial}a{color:var(--blue)}.wrap{max-width:980px;margin:28px auto;padding:20px}.panel{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:18px;box-shadow:0 18px 50px #0005}.title{font-size:28px;font-weight:900;text-align:center;color:var(--brand);margin-bottom:12px}.sect{margin-bottom:12px}.h2{display:flex;align-items:center;gap:12px;font-weight:800;color:var(--green);margin-bottom:10px}.grid{display:grid;gap:10px}.cols-2{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.cols-3{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}input,select,textarea{background:#081426;border:1px solid #172033;color:#e6f3ff;border-radius:12px;padding:10px;font-size:15px;width:100%}textarea{min-height:260px;font-family:monospace;white-space:pre;overflow:auto}button{background:#0f1a2d;color:#dbe7ff;border:1px solid #ffffff22;border-radius:12px;padding:8px 12px;font-weight:800;cursor:pointer}button.primary{background:var(--green);border-color:rgba(16,185,129,.12);color:#fff}button.primary:hover{background:#059669}small{color:var(--muted);display:block;margin-top:8px}label{display:block;color:var(--muted);font-size:.92rem;margin-bottom:6px}.muted{color:var(--muted)}.slide-block{padding:10px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.01),transparent);border:1px solid rgba(255,255,255,.03)}.week-days{display:flex;gap:8px;flex-wrap:wrap}.week-days label{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.02);padding:6px 8px;border-radius:8px;border:1px solid transparent}.small-btn{padding:6px 10px;border-radius:10px;font-weight:700}.hr{height:1px;background:var(--line);margin:12px 0;border-radius:2px}
+@media(max-width:420px){.title{font-size:20px}}
+</style>
+</head><body>
+<div class="wrap">
+  <div class="title">➤ Masjid JSON Generator</div>
+
+  <!-- 1: Meta -->
+  <div class="panel">
+    <div class="h2">1️⃣ Identitas Masjid</div>
+    <div class="grid cols-2">
+      <label>Nama Masjid<input id="meta_name" placeholder="Masjid At Taubah" value="Masjid At Taubah"></label>
+      <label>Alamat<input id="meta_addr" placeholder="Alamat masjid" value="Perum T Murni RW-15"></label>
+      <label>Latitude (boleh kosong)<input id="meta_lat" placeholder="Latitude (boleh kosong)"></label>
+      <label>Longitude (boleh kosong)<input id="meta_lon" placeholder="Longitude (boleh kosong)"></label>
+      <div style="grid-column:1/-1">
+        <label>ID Kota MyQuran<input id="meta_city" placeholder="ID Kota MyQuran" value="1203"></label>
+        <small class="muted">🔎 Belum tahu kode kota? Lihat <a href="https://api.myquran.com/v2/sholat/kota/semua" target="_blank">daftar kota MyQuran</a> lalu isi angka <code>id</code> di atas.</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2: Slides -->
+  <div class="panel">
+    <div class="h2">2️⃣ Slide Gambar</div>
+    <div id="slidesList" class="grid"></div>
+    <div style="margin-top:12px"><button id="addSlideBtn" class="small-btn">+ Tambah Slide</button></div>
+    <small class="muted">Atur jadwal tampil tiap slide: <strong>Always</strong>, <strong>Weekly</strong> (pilih hari), <strong>Date</strong> (pilih satu tanggal), atau <strong>Range</strong> (dari–sampai).</small>
+  </div>
+
+  <!-- 3: Running text -->
+  <div class="panel">
+    <div class="h2">3️⃣ Running Text</div>
+    <div id="rtList" class="grid"></div>
+    <div style="margin-top:10px"><button id="addRTBtn" class="small-btn">+ Tambah Baris</button></div>
+  </div>
+
+  <!-- 4: Offsets & Iqamah -->
+  <div class="panel">
+    <div class="h2">4️⃣ Koreksi Waktu & Jeda Iqamah</div>
+    <div class="grid cols-3">
+      <label>Koreksi Subuh<input id="off_fajr" type="number" value="0"></label>
+      <label>Koreksi Terbit<input id="off_sunrise" type="number" value="0"></label>
+      <label>Koreksi Dzuhur<input id="off_dhuhr" type="number" value="0"></label>
+      <label>Koreksi Ashar<input id="off_asr" type="number" value="0"></label>
+      <label>Koreksi Maghrib<input id="off_maghrib" type="number" value="0"></label>
+      <label>Koreksi Isya<input id="off_isha" type="number" value="0"></label>
+    </div>
+    <div class="hr"></div>
+    <div class="grid cols-3">
+      <label>Iqamah Subuh<input id="iq_fajr" type="number" value="10"></label>
+      <label>Iqamah Dzuhur<input id="iq_dhuhr" type="number" value="10"></label>
+      <label>Iqamah Ashar<input id="iq_asr" type="number" value="10"></label>
+      <label>Iqamah Maghrib<input id="iq_maghrib" type="number" value="5"></label>
+      <label>Iqamah Isya<input id="iq_isha" type="number" value="10"></label>
+    </div>
+  </div>
+
+  <!-- 5: Notify -->
+  <div class="panel">
+    <div class="h2">5️⃣ Pengingat Adzan & Sholat</div>
+    <div class="grid cols-2">
+      <label>Durasi notifikasi adzan (detik)<input id="notify_sec" type="number" value="240"></label>
+      <label>Durasi tampilan "Sholat Dimulai" (menit)<input id="notify_start" type="number" value="10"></label>
+    </div>
+  </div>
+
+  <!-- 6: Adzan -->
+  <div class="panel">
+    <div class="h2">6️⃣ Pengaturan Adzan</div>
+    <div class="grid cols-2">
+      <label>Durasi Beep (detik)<input id="adzan_beep" type="number" value="5"></label>
+      <label>Pola Adzan<input id="adzan_pattern" value="standard"></label>
+    </div>
+  </div>
+
+  <!-- 7: Keuangan -->
+  <div class="panel">
+    <div class="h2">7️⃣ Data Keuangan</div>
+    <div id="keuList" class="grid"></div>
+    <div style="margin-top:12px"><button id="addKeuBtn" class="small-btn">+ Tambah Data Keuangan</button></div>
+    <div style="margin-top:10px"><label>Hadist keuangan<textarea id="keu_hadist">Dan apa saja yang kamu infakkan, Allah akan menggantinya...</textarea></label></div>
+  </div>
+
+  <!-- 8: Auth -->
+  <div class="panel">
+    <div class="h2">8️⃣ Token Akses</div>
+    <div class="grid cols-2">
+      <label>Token akses<input id="auth_token" placeholder="MATTAUBAH" value="MATTAUBAH"></label>
+      <label>Timestamp<input id="auth_ts" type="number" value="1762177894252"></label>
+    </div>
+  </div>
+
+  <!-- Output -->
+  <div class="panel">
+    <div class="h2">🧾 Hasil JSON</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <button id="genBtn" class="primary">Generate JSON</button>
+      <button id="copyBtn">Copy JSON</button>
+      <button id="waBtn">Kirim ke WhatsApp</button>
+      <button id="resetBtn">Reset Form</button>
+    </div>
+    <textarea id="output" placeholder="Hasil JSON akan tampil di sini..."></textarea>
+  </div>
+</div>
+
+<script>
+/* ---------- util ---------- */
+const $ = id => document.getElementById(id);
+const weekLabels = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+
+/* ---------- create / UI helpers ---------- */
+function makeSlideBlock(data){
+  // data: {src,caption,schedule:{type,days|date|from,to}}
+  const div = document.createElement('div');
+  div.className = 'slide-block';
+  div.style.marginBottom = '10px';
+  const src = data?.src||'';
+  const cap = data?.caption||'';
+  const sch = (data && data.schedule && data.schedule.type) ? data.schedule.type : 'always';
+  const schData = data && data.schedule ? data.schedule : {};
+  div.innerHTML = `
+    <div style="display:grid;gap:8px">
+      <label>Image URL<input class="slide-src" placeholder="https://..." value="${escapeHtml(src)}"></label>
+      <label>Caption<input class="slide-caption" placeholder="Caption" value="${escapeHtml(cap)}"></label>
+      <label>Schedule
+        <select class="slide-schedule">
+          <option value="always">Always</option>
+          <option value="weekly">Weekly</option>
+          <option value="date">Date</option>
+          <option value="range">Range</option>
+        </select>
+      </label>
+      <div class="slide-details"></div>
+      <div style="display:flex;gap:8px;margin-top:6px"><button class="remove-slide small-btn">Hapus</button></div>
+    </div>`;
+  // events & detail render
+  const sel = div.querySelector('.slide-schedule');
+  const details = div.querySelector('.slide-details');
+  sel.value = sch;
+  function renderDetails(){
+    details.innerHTML = '';
+    if(sel.value === 'weekly'){
+      const wrap = document.createElement('div'); wrap.className='week-days';
+      for(let i=0;i<7;i++){
+        const lbl = document.createElement('label');
+        const ch = document.createElement('input');
+        ch.type='checkbox'; ch.className='day-ch'; ch.dataset.day = i;
+        if(Array.isArray(schData.days) && schData.days.includes(i)) ch.checked = true;
+        lbl.appendChild(ch);
+        const span = document.createElement('span'); span.textContent = weekLabels[i];
+        lbl.appendChild(span);
+        wrap.appendChild(lbl);
+      }
+      details.appendChild(wrap);
+    } else if (sel.value === 'date'){
+      const lbl = document.createElement('label');
+      lbl.innerHTML = 'Tanggal (YYYY-MM-DD)<input type="date" class="slide-date" value="'+(schData.date||'')+'">';
+      details.appendChild(lbl);
+    } else if (sel.value === 'range'){
+      const l1 = document.createElement('label'); l1.innerHTML = 'Dari<input type="date" class="slide-from" value="'+(schData.from||'')+'">';
+      const l2 = document.createElement('label'); l2.innerHTML = 'Sampai<input type="date" class="slide-to" value="'+(schData.to||'')+'">';
+      details.appendChild(l1); details.appendChild(l2);
+    }
+    // hide if always
+    details.style.display = sel.value === 'always' ? 'none' : 'block';
+  }
+  sel.addEventListener('change', ()=>{ renderDetails(); savePersist(); });
+  div.querySelector('.remove-slide').addEventListener('click', ()=>{
+    if(confirm('Hapus slide ini?')){ div.remove(); savePersist(); }
+  });
+  // auto save on input changes
+  div.addEventListener('input', ()=>savePersist());
+  renderDetails();
+  return div;
+}
+function escapeHtml(s){ return String(s||'').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+/* ---------- add items ---------- */
+function addSlide(data){
+  const block = makeSlideBlock(data||{src:'',caption:'',schedule:{type:'always'}})
+  $('slidesList').appendChild(block);
+  savePersist();
+}
+function addRT(text){
+  const inp = document.createElement('input');
+  inp.className='rt-line';
+  inp.placeholder='Teks berjalan';
+  inp.value = text||'';
+  inp.style.marginBottom='8px';
+  inp.addEventListener('input', savePersist);
+  $('rtList').appendChild(inp);
+  savePersist();
+}
+function addKeu(entry){
+  const div = document.createElement('div'); div.className='slide-block'; div.style.marginBottom='10px';
+  const d = entry||{year:'2025',month:'01',penerimaan:'0',pengeluaran:'0',saldo:'0'};
+  div.innerHTML=`
+    <label>Tahun<input class="keu-year" value="${escapeHtml(d.year)}"></label>
+    <label>Bulan (01-12)<input class="keu-month" value="${escapeHtml(d.month)}"></label>
+    <label>Penerimaan<input class="keu-penerimaan" value="${escapeHtml(d.penerimaan)}"></label>
+    <label>Pengeluaran<input class="keu-pengeluaran" value="${escapeHtml(d.pengeluaran)}"></label>
+    <label>Saldo<input class="keu-saldo" value="${escapeHtml(d.saldo)}"></label>
+    <div style="display:flex;gap:8px;margin-top:8px"><button class="remove-keu small-btn">Hapus</button></div>`;
+  div.querySelector('.remove-keu').addEventListener('click', ()=>{
+    if(confirm('Hapus entri keuangan?')){ div.remove(); savePersist(); }
+  });
+  div.addEventListener('input', savePersist);
+  $('keuList').appendChild(div);
+  savePersist();
+}
+
+/* ---------- JSON generation ---------- */
+function buildSlidesJSON(){
+  const blocks = Array.from(document.querySelectorAll('#slidesList .slide-block'));
+  return blocks.map(b=>{
+    const src = b.querySelector('.slide-src')?.value?.trim()||'';
+    const caption = b.querySelector('.slide-caption')?.value?.trim()||'';
+    const type = b.querySelector('.slide-schedule')?.value || 'always';
+    const schedule = {type};
+    if(type === 'weekly'){
+      const days = Array.from(b.querySelectorAll('.day-ch')).filter(ch=>ch.checked).map(ch=>parseInt(ch.dataset.day,10));
+      schedule.days = days;
+    } else if (type === 'date'){
+      const d = b.querySelector('.slide-date')?.value || '';
+      if(d) schedule.date = d;
+    } else if (type === 'range'){
+      const from = b.querySelector('.slide-from')?.value || '';
+      const to = b.querySelector('.slide-to')?.value || '';
+      if(from) schedule.from = from;
+      if(to) schedule.to = to;
+    }
+    return {src,caption,schedule};
+  });
+}
+function genJSON(){
+  const j = {
+    meta:{
+      name: $('meta_name').value.trim()||'Masjid At Taubah',
+      addr: $('meta_addr').value.trim()||'',
+      lat: $('meta_lat').value? (isNaN(+$('meta_lat').value)? null : +$('meta_lat').value): null,
+      lon: $('meta_lon').value? (isNaN(+$('meta_lon').value)? null : +$('meta_lon').value): null,
+      myqCityId: $('meta_city').value? (+$('meta_city').value || null): null
+    },
+    slides: buildSlidesJSON(),
+    rt: { content: Array.from(document.querySelectorAll('.rt-line')).map(i=>i.value).filter(Boolean) },
+    offsets: { Fajr:+$('off_fajr').value||0, Sunrise:+$('off_sunrise').value||0, Dhuhr:+$('off_dhuhr').value||0, Asr:+$('off_asr').value||0, Maghrib:+$('off_maghrib').value||0, Isha:+$('off_isha').value||0 },
+    iqamah: { Fajr:+$('iq_fajr').value||0, Dhuhr:+$('iq_dhuhr').value||0, Asr:+$('iq_asr').value||0, Maghrib:+$('iq_maghrib').value||0, Isha:+$('iq_isha').value||0 },
+    notify: { notifySeconds:+$('notify_sec').value||0, startedMinutes:+$('notify_start').value||0 },
+    adzan: { adzanBeepSeconds:+$('adzan_beep').value||0, adzanPattern: $('adzan_pattern').value||'standard' },
+    keuangan: Array.from(document.querySelectorAll('#keuList .slide-block')).map(k=>({
+      year: k.querySelector('.keu-year')?.value||'', month: k.querySelector('.keu-month')?.value||'', penerimaan: +(k.querySelector('.keu-penerimaan')?.value||0), pengeluaran: +(k.querySelector('.keu-pengeluaran')?.value||0), saldo: +(k.querySelector('.keu-saldo')?.value||0)
+    })),
+    keuangan_meta: { hadist: $('keu_hadist').value || '' },
+    auth: { token: $('auth_token').value||'', ts: +($('auth_ts').value||0) }
+  };
+  $('output').value = JSON.stringify(j, null, 2);
+  savePersist(); // persist form state when generating
+}
+
+/* ---------- clipboard & WA ---------- */
+document.getElementById('copyBtn').onclick = ()=> {
+  const t = $('output').value.trim();
+  if(!t){ alert('Generate JSON dulu.'); return; }
+  navigator.clipboard.writeText(t).then(()=>alert('✅ JSON disalin ke clipboard!'));
+};
+document.getElementById('waBtn').onclick = ()=> {
+  const t = $('output').value.trim();
+  if(!t){ alert('Generate JSON dulu.'); return; }
+  const phone = '6281315161561'; // <-- ganti dengan nomor kamu (format internasional tanpa +), contoh: 6281315161561
+  const msg = encodeURIComponent("Assalamu'alaikum, ini hasil JSON pengaturan masjid:\n\n"+t);
+  window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+};
+
+/* ---------- persist (localStorage) ---------- */
+const PKEY = 'masjid_json_generator_v1';
+function collectState(){
+  return {
+    meta:{
+      name:$('meta_name').value, addr:$('meta_addr').value, lat:$('meta_lat').value, lon:$('meta_lon').value, myqCityId:$('meta_city').value
+    },
+    slides: buildSlidesJSON(),
+    rt: Array.from(document.querySelectorAll('.rt-line')).map(i=>i.value).filter(Boolean),
+    offsets: { Fajr:$('off_fajr').value, Sunrise:$('off_sunrise').value, Dhuhr:$('off_dhuhr').value, Asr:$('off_asr').value, Maghrib:$('off_maghrib').value, Isha:$('off_isha').value },
+    iqamah: { Fajr:$('iq_fajr').value, Dhuhr:$('iq_dhuhr').value, Asr:$('iq_asr').value, Maghrib:$('iq_maghrib').value, Isha:$('iq_isha').value },
+    notify: { notifySeconds:$('notify_sec').value, startedMinutes:$('notify_start').value },
+    adzan: { adzanBeepSeconds:$('adzan_beep').value, adzanPattern:$('adzan_pattern').value },
+    keuangan: Array.from(document.querySelectorAll('#keuList .slide-block')).map(k=>({ year:k.querySelector('.keu-year').value, month:k.querySelector('.keu-month').value, penerimaan:k.querySelector('.keu-penerimaan').value, pengeluaran:k.querySelector('.keu-pengeluaran').value, saldo:k.querySelector('.keu-saldo').value})),
+    keuangan_meta: { hadist: $('keu_hadist').value },
+    auth: { token:$('auth_token').value, ts:$('auth_ts').value }
+  };
+}
+function savePersist(){ try{ localStorage.setItem(PKEY, JSON.stringify(collectState())); }catch(e){} }
+function loadPersist(){
+  try{
+    const s = localStorage.getItem(PKEY);
+    if(!s) return false;
+    const st = JSON.parse(s);
+    if(st.meta){ $('meta_name').value = st.meta.name||''; $('meta_addr').value = st.meta.addr||''; $('meta_lat').value = st.meta.lat||''; $('meta_lon').value = st.meta.lon||''; $('meta_city').value = st.meta.myqCityId||''; }
+    $('slidesList').innerHTML = '';
+    if(Array.isArray(st.slides) && st.slides.length){ st.slides.forEach(sl=> addSlide(sl)); } else { addSlide({src:'',caption:'',schedule:{type:'always'}}); }
+    $('rtList').innerHTML = ''; if(Array.isArray(st.rt)) st.rt.forEach(t=>addRT(t)); else addRT('Selamat datang di Masjid');
+    // offsets & iqamah & others
+    if(st.offsets){ $('off_fajr').value = st.offsets.Fajr||0; $('off_sunrise').value = st.offsets.Sunrise||0; $('off_dhuhr').value = st.offsets.Dhuhr||0; $('off_asr').value = st.offsets.Asr||0; $('off_maghrib').value = st.offsets.Maghrib||0; $('off_isha').value = st.offsets.Isha||0; }
+    if(st.iqamah){ $('iq_fajr').value = st.iqamah.Fajr||10; $('iq_dhuhr').value = st.iqamah.Dhuhr||10; $('iq_asr').value = st.iqamah.Asr||10; $('iq_maghrib').value = st.iqamah.Maghrib||5; $('iq_isha').value = st.iqamah.Isha||10; }
+    if(st.notify){ $('notify_sec').value = st.notify.notifySeconds||240; $('notify_start').value = st.notify.startedMinutes||10; }
+    if(st.adzan){ $('adzan_beep').value = st.adzan.adzanBeepSeconds||5; $('adzan_pattern').value = st.adzan.adzanPattern||'standard'; }
+    $('keuList').innerHTML = ''; if(Array.isArray(st.keuangan) && st.keuangan.length){ st.keuangan.forEach(k => addKeu(k)); } else addKeu();
+    if(st.keuangan_meta) $('keu_hadist').value = st.keuangan_meta.hadist||'';
+    if(st.auth){ $('auth_token').value = st.auth.token||''; $('auth_ts').value = st.auth.ts||''; }
+    return true;
+  }catch(e){ console.warn(e); return false; }
+}
+
+/* ---------- reset ---------- */
+$('resetBtn').onclick = ()=> {
+  if(!confirm('Reset form dan hapus data tersimpan di browser?')) return;
+  localStorage.removeItem(PKEY);
+  location.reload();
+};
+
+/* ---------- wire buttons ---------- */
+$('addSlideBtn').onclick = ()=> addSlide();
+$('addRTBtn').onclick = ()=> addRT();
+$('addKeuBtn').onclick = ()=> addKeu();
+$('genBtn').onclick = ()=> genJSON();
+
+/* ---------- initial load ---------- */
+if(!loadPersist()){
+  // default starter content
+  addSlide({src:'https://wisatamuliainsani.com/wp-content/uploads/2024/07/Mengintip-Keindahan-Kota-Thaif-yang-Penuh-dengan-Sejarah-Wisata-Mulia-Insani-scaled.jpg', caption:'Thaif', schedule:{type:'always'}});
+  addRT('Selamat datang di Masjid At Taubah');
+  addRT('Jadwal sholat mengikuti kota setempat');
+  addKeu({year:'2025',month:'01',penerimaan:'1500000',pengeluaran:'500000',saldo:'1000000'});
+}
+
+/* ---------- small helper: ensure we save on any change ---------- */
+document.addEventListener('input', (e)=>{ savePersist(); });
+
+/* ---------- escape helper end ---------- */
+</script>
+</body></html>
