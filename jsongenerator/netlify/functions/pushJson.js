@@ -1,77 +1,117 @@
-// netlify/functions/pushJson.js
+// pushJson.js
+// Netlify Function: menerima GET (healthcheck) dan POST (push JSON ke GitHub).
+// Tempatkan di: netlify/functions/pushJson.js
+// Harus ada env vars: NETLIFY_GH_TOKEN (GitHub token), PUSH_SECRET (shared secret)
+
+const https = require('https');
+
+const GH_OWNER = 'abuhasanhm';           // ganti jika repo owner beda
+const GH_REPO  = 'data-masjid';          // ganti nama repo tujuan
+const GH_PATH  = 'jammasjid_backup_2025-11-03.json';// ganti nama file di repo (path relatif)
+
+function jsonResp(code, obj) {
+  return {
+    statusCode: code,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*', // untuk dev. kunci ke origin produksi kalau perlu
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type,x-push-secret'
+    },
+    body: JSON.stringify(obj)
+  };
+}
+
+function ghRequest(method, path, token, payload) {
+  return new Promise((resolve, reject) => {
+    const opts = {
+      hostname: 'api.github.com',
+      path,
+      method,
+      headers: {
+        'User-Agent': 'netlify-function',
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': token ? `token ${token}` : undefined
+      }
+    };
+    const req = https.request(opts, res => {
+      let d = '';
+      res.on('data', c => d += c);
+      res.on('end', () => {
+        let parsed;
+        try { parsed = d ? JSON.parse(d) : {}; } catch(e) { parsed = d; }
+        resolve({ status: res.statusCode, body: parsed });
+      });
+    });
+    req.on('error', e => reject(e));
+    if (payload) req.write(JSON.stringify(payload));
+    req.end();
+  });
+}
+
 exports.handler = async function(event) {
   try {
-    if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
+    // CORS preflight
+    if (event.httpMethod === 'OPTIONS') return jsonResp(200, { ok:true });
 
-    const secretHeader = event.headers['x-push-secret'] || event.headers['X-Push-Secret'] || '';
-    const expected = process.env.PUSH_SECRET || '';
-    if (!expected || secretHeader !== expected)
-      return { statusCode: 401, body: 'Unauthorized' };
-
-    const GH_TOKEN = process.env.NETLIFY_GH_TOKEN;
-    const OWNER = process.env.GITHUB_OWNER;
-    const REPO = process.env.GITHUB_REPO;
-    const DEFAULT_PATH = process.env.DEFAULT_PATH || 'jammasjid.json';
-    const DEFAULT_BRANCH = process.env.DEFAULT_BRANCH || 'main';
-
-    if (!GH_TOKEN || !OWNER || !REPO)
-      return { statusCode: 500, body: 'Server not configured' };
-
-    const body = JSON.parse(event.body || '{}');
-    const content = body.content;
-    if (!content) return { statusCode: 400, body: 'Missing content' };
-
-    const path = body.path || DEFAULT_PATH;
-    const branch = body.branch || DEFAULT_BRANCH;
-    const message = body.message || `Update ${path} via generator`;
-
-    const apiUrl = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}`;
-
-    // --- check if file exists ---
-    const getRes = await fetch(`${apiUrl}?ref=${encodeURIComponent(branch)}`, {
-      headers: { Authorization: `token ${GH_TOKEN}`, 'User-Agent': 'masjid-generator' }
-    });
-    let sha = null;
-    if (getRes.status === 200) {
-      const getJson = await getRes.json();
-      sha = getJson.sha;
-    } else if (getRes.status !== 404) {
-      const txt = await getRes.text();
-      return { statusCode: getRes.status, body: `Error reading file: ${txt}` };
+    // GET = health / quick info
+    if (event.httpMethod === 'GET') {
+      return jsonResp(200, { ok:true, msg:'pushJson alive. Use POST with x-push-secret and JSON body to push.' });
     }
 
-    // --- prepare payload ---
-    const payload = {
-      message,
-      content: Buffer.from(content).toString('base64'),
-      branch
-    };
-    if (sha) payload.sha = sha;
+    // Only allow POST for push
+    if (event.httpMethod !== 'POST') return jsonResp(405, { error: 'Method Not Allowed. Use POST' });
 
-    // --- upload to GitHub ---
-    const putRes = await fetch(apiUrl, {
-      method: 'PUT',
-      headers: {
-        Authorization: `token ${GH_TOKEN}`,
-        'User-Agent': 'masjid-generator',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
+    // Validate secret header
+    const headers = Object.assign({}, event.headers || {});
+    const pushSecretHeader = headers['x-push-secret'] || headers['X-Push-Secret'] || headers['x-push_secret'];
+    const PUSH_SECRET = process.env.PUSH_SECRET || '';
+    if (!PUSH_SECRET || !pushSecretHeader || pushSecretHeader !== PUSH_SECRET) {
+      return jsonResp(401, { error: 'Unauthorized: missing/invalid x-push-secret header' });
+    }
 
-    const putJson = await putRes.json();
-    if (!putRes.ok) return { statusCode: putRes.status, body: JSON.stringify(putJson) };
+    // Parse body JSON
+    let payload;
+    try {
+      payload = event.body ? JSON.parse(event.body) : null;
+    } catch (e) {
+      return jsonResp(400, { error: 'Invalid JSON body' });
+    }
+    if (!payload) return jsonResp(400, { error: 'Empty payload' });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        ok: true,
-        file: path,
-        url: putJson.content.html_url,
-        commit: putJson.commit.html_url
-      })
-    };
+    // Prepare content
+    const contentStr = JSON.stringify(payload, null, 2);
+    const contentB64 = Buffer.from(contentStr, 'utf8').toString('base64');
+
+    // GitHub token from env
+    const GH_TOKEN = process.env.NETLIFY_GH_TOKEN;
+    if (!GH_TOKEN) return jsonResp(500, { error: 'Server misconfigured: missing NETLIFY_GH_TOKEN' });
+
+    // Get current file (to obtain sha if exists)
+    const fileApiPath = `/repos/${GH_OWNER}/${GH_REPO}/contents/${encodeURIComponent(GH_PATH)}`;
+    const getRes = await ghRequest('GET', fileApiPath, GH_TOKEN);
+
+    let sha = null;
+    if (getRes.status === 200 && getRes.body && getRes.body.sha) sha = getRes.body.sha;
+
+    // Commit message
+    const name = (payload.meta && payload.meta.name) ? payload.meta.name : 'JSON Generator';
+    const commitMsg = `Update ${GH_PATH} via ${name} (${new Date().toISOString()})`;
+
+    const putPayload = { message: commitMsg, content: contentB64 };
+    if (sha) putPayload.sha = sha;
+
+    // PUT request to create/update file
+    const putRes = await ghRequest('PUT', fileApiPath, GH_TOKEN, putPayload);
+
+    if (putRes.status >= 200 && putRes.status < 300) {
+      return jsonResp(200, { ok:true, result: putRes.body });
+    } else {
+      // Return GitHub error details
+      return jsonResp(putRes.status || 500, { error: 'GitHub API error', details: putRes.body });
+    }
+
   } catch (err) {
-    return { statusCode: 500, body: String(err) };
+    return jsonResp(500, { error: 'Internal error', message: String(err && err.message ? err.message : err) });
   }
 };
