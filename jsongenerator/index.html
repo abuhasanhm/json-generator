@@ -1,5 +1,270 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Masjid JSON Generator</title><style>:root{--bg:#07101a;--panel:#0b1722;--muted:#98a5c0;--text:#eaf6ff;--accent:#06b6d4}*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Roboto,Arial}a{color:var(--accent)}.wrap{max-width:980px;margin:28px auto;padding:20px}.card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border:1px solid #ffffff12;border-radius:12px;padding:18px;margin-bottom:14px}.row{display:flex;gap:12px;flex-wrap:wrap}.col{flex:1;min-width:160px}.field{display:flex;flex-direction:column;margin-bottom:10px}.field label{font-weight:700;color:#9feaf1;margin-bottom:6px}.input,textarea,select{padding:10px;border-radius:8px;border:1px solid #ffffff12;background:#071c26;color:var(--text)}textarea{min-height:100px;resize:vertical}.btn{background:linear-gradient(90deg,#0f2a33,#07323f);border:1px solid #ffffff18;padding:10px 14px;border-radius:10px;color:var(--text);cursor:pointer;font-weight:700}.btn.prim{background:linear-gradient(90deg,#06b6d4,#06a59f)}.right{display:flex;gap:10px;align-items:center}.small{font-size:.9rem;color:var(--muted)}footer{margin-top:14px;color:var(--muted);font-size:.9rem}.pill{display:inline-block;padding:6px 10px;background:#071928;border-radius:8px;border:1px solid #ffffff10}.hide{display:none}.notice{background:#05202a;padding:10px;border-radius:8px;border:1px solid #ffffff10;margin-bottom:12px}.json-btn{position:fixed;left:14px;bottom:14px;border-radius:999px;padding:12px 16px;background:#0b2b2f;z-index:60}.push-area{position:fixed;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px;z-index:60}.push-area button{min-width:170px}.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:9999}.modal .box{background:var(--panel);padding:18px;border-radius:10px;border:1px solid #ffffff10;width:90%;max-width:520px}.toast{position:fixed;left:50%;transform:translateX(-50%);top:18px;background:#063036;padding:10px 14px;border-radius:8px;display:none}.placeholder{color:#e0e0e0;opacity:.9}::placeholder{color:#e0e0e0;opacity:.9}@media(max-width:768px){.row{flex-direction:column}.push-area{position:static;flex-direction:row;justify-content:space-between}.push-area button{flex:1}}/* mobile: ensure PushSecret visible */@media(max-width:480px){#btnSetPushSecret{display:block!important;position:relative!important;bottom:auto!important;right:auto!important;margin-top:6px;width:100%}} </style></head><body><div class="wrap"><h1 style="text-align:center;color:var(--accent);margin:6px 0 18px">▶ Masjid JSON Generator</h1><div class="card"><div class="notice small">Isi data masjid lalu <strong>Push ke GitHub</strong> untuk perbarui file JSON di repo <code>data-masjid</code>. Pastikan <em>PUSH secret</em> sudah diset di Netlify functions.</div><div class="row"><div class="col"><div class="field"><label>Nama Masjid</label><input id="name" class="input" placeholder="Masjid At Taubah"></div><div class="field"><label>Alamat</label><input id="addr" class="input" placeholder="Perum T Murni RW-15"></div><div class="field"><label>Latitude (opsional)</label><input id="lat" class="input" placeholder="Latitude (boleh kosong)"></div><div class="field"><label>Longitude (opsional)</label><input id="lon" class="input" placeholder="Longitude (boleh kosong)"></div><div class="field"><label>ID Kota MyQuran</label><input id="myqCityId" class="input" placeholder="1203"></div></div><div class="col"><div class="field"><label>Slide gambar (URL)</label><input id="slideSrc" class="input" placeholder="https://...jpg"></div><div class="field"><label>Caption slide</label><input id="slideCaption" class="input" placeholder="Judul slide"></div><div class="field"><label>Schedule</label><select id="slideSchedule" class="input"><option value="always">Always</option><option value="weekly">Weekly</option><option value="date">Specific date</option></select></div><div class="field"><label>Adzan beep seconds</label><input id="adzanBeepSeconds" class="input" placeholder="5"></div></div></div></div><div class="card"><h3 style="margin:0 0 10px">Data Keuangan (opsional)</h3><div class="row"><div class="col"><div class="field"><label>Tahun</label><input id="keuYear" class="input" placeholder="2025"></div></div><div class="col"><div class="field"><label>Bulan</label><input id="keuMonth" class="input" placeholder="01"></div></div><div class="col"><div class="field"><label>Penerimaan</label><input id="keuPenerimaan" class="input" placeholder="1500000"></div></div></div><div class="row"><div class="col"><div class="field"><label>Pengeluaran</label><input id="keuPengeluaran" class="input" placeholder="500000"></div></div><div class="col"><div class="field"><label>Saldo</label><input id="keuSaldo" class="input" placeholder="1000000"></div></div></div><div class="field"><label>Hadist (opsional)</label><textarea id="keuHadist" placeholder="Dan apa saja yang kamu infakkan..."></textarea></div></div><div class="card"><h3 style="margin:0 0 10px">Auth / Token (opsional)</h3><div class="field"><label>Token (untuk file auth di JSON)</label><input id="authToken" class="input" placeholder="MATTAUBAH"></div><div class="small">Token ini harus juga ada di <code>valid-tokens.json</code> pada aplikasi jam masjid agar data diterima.</div></div><div class="card"><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="btnShowJson" class="btn">Tampilkan JSON (tab baru)</button><button id="btnPush" class="btn prim">Push ke GitHub</button><button id="btnSendWA" class="btn">Kirim ke WA Admin</button><button id="btnSetPushSecret" class="btn" style="display:none">Set PUSH Secret</button></div><div id="status" class="small" style="margin-top:10px"></div></div><footer>Uploaded ke GitHub → file target biasanya: <code>data-masjid/jammasjid_backup_YYYY-MM-DD.json</code>. Setelah push, aplikasi jam masjid bisa auto-fetch dari raw GitHub atau menggunakan sync yang sudah kita implement.</footer></div><!-- push area & json floating button --><button class="json-btn btn" id="btnQuickJson">JSON</button><div class="push-area"><button id="btnSetPushSecretFixed" class="btn" style="display:none">Set PUSH Secret</button></div><!-- modal push secret --> <div class="modal" id="modalSecret"><div class="box"><h3>Set PUSH Secret</h3><div class="field"><label>Secret (x-push-secret)</label><input id="pushSecretInput" class="input" placeholder="isi secret untuk endpoint functions"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button id="pushSecretSave" class="btn prim">Simpan</button><button id="pushSecretCancel" class="btn">Batal</button></div></div></div><div class="modal" id="modalToast"><div class="box"><div id="toastText">...</div></div></div><script>const el=id=>document.getElementById(id);const showToast=(t,ms=2200)=>{const m=el('modalToast');el('toastText').textContent=t; m.style.display='flex';setTimeout(()=>m.style.display='none',ms)};const getVal=id=>el(id).value.trim();const buildObj=()=>{const meta={name:getVal('name')||'Masjid',addr:getVal('addr')||'',lat:getVal('lat')||null,lon:getVal('lon')||null,myqCityId: parseInt(getVal('myqCityId')||'0')||703};const slides=[];const ssrc=getVal('slideSrc');if(ssrc){slides.push({src:ssrc,caption:getVal('slideCaption')||'',schedule:{type:getVal('slideSchedule')||'always'}})} const keuYear=getVal('keuYear');const keuangan=keuYear?[{year:keuYear,month:getVal('keuMonth')||'01',penerimaan:parseInt(getVal('keuPenerimaan')||0),pengeluaran:parseInt(getVal('keuPengeluaran')||0),saldo:parseInt(getVal('keuSaldo')||0)}]:[];const payload={meta,slides,rt:{content:[getVal('keuHadist')||'Selamat datang di Masjid']},offsets:{},iqamah:{},notify:{notifySeconds:parseInt(getVal('adzanBeepSeconds')||240),startedMinutes:10},keuangan,keuangan_meta:{hadist:getVal('keuHadist')||''},auth:{token:getVal('authToken')||'',ts:Date.now()},message:`Update jammasjid via generator ${new Date().toISOString()}`};return payload};const openJsonTab=()=>{const j=buildObj();const blob=new Blob([JSON.stringify(j,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);window.open(url,'_blank');setTimeout(()=>URL.revokeObjectURL(url),5000)};el('btnShowJson').onclick=openJsonTab;el('btnQuickJson').onclick=openJsonTab;function updateStatus(t){el('status').textContent=t}async function pushToGit(){try{updateStatus('Mempersiapkan JSON...');const j=buildObj();const body={path:'jammasjid_backup_'+(new Date()).toISOString().slice(0,10)+'.json',content:JSON.stringify(j,2),message:'Update jammasjid via generator'};updateStatus('Mengirim ke Netlify function...');const secret=localStorage.getItem('PUSH_SECRET')||'';const r=await fetch('/.netlify/functions/pushJson',{method:'POST',headers:{'content-type':'application/json','x-push-secret':secret||''},body:JSON.stringify(body)});const txt=await r.text();if(!r.ok)throw new Error(txt||r.status);updateStatus('Push sukses');showToast('Push sukses: OK');}catch(e){console.error(e);updateStatus('Push error');showToast('Push error: '+(e.message||e))}}el('btnPush').onclick=()=>{if(!confirm('Yakin mau push ke GitHub?'))return;pushToGit()};el('btnSendWA').onclick=()=>{const j=buildObj();const raw=encodeURIComponent(JSON.stringify(j));const waUrl='https://wa.me/?text='+raw;window.open(waUrl,'_blank')};el('btnSetPushSecret').onclick=()=>el('modalSecret').style.display='flex';el('btnSetPushSecretFixed').onclick=()=>el('modalSecret').style.display='flex';el('pushSecretCancel').onclick=()=>el('modalSecret').style.display='none';el('pushSecretSave').onclick=()=>{const v=getVal('pushSecretInput');if(!v){alert('Isi secret dulu');return}localStorage.setItem('PUSH_SECRET',v);el('modalSecret').style.display='none';showToast('Secret tersimpan');}; // show buttons if localStorage has push secret (for UX)
-(function(){if(localStorage.getItem('PUSH_SECRET')){el('btnSetPushSecret').style.display='inline-block';el('btnSetPushSecretFixed').style.display='inline-block'}else{el('btnSetPushSecret').style.display='inline-block';el('btnSetPushSecretFixed').style.display='inline-block'}})(); // small convenience: load last used values from localStorage
-(function(){try{const s=localStorage.getItem('gen_last');if(!s)return;const o=JSON.parse(s);if(o.meta){el('name').value=o.meta.name||'';el('addr').value=o.meta.addr||'';el('lat').value=o.meta.lat||'';el('lon').value=o.meta.lon||'';el('myqCityId').value=o.meta.myqCityId||''}if(o.slides&&o.slides[0]){el('slideSrc').value=o.slides[0].src||'';el('slideCaption').value=o.slides[0].caption||''}if(o.auth)el('authToken').value=o.auth.token||'';}catch(e){}})(); // autosave current form to localStorage
-setInterval(()=>{try{const snapshot=buildObj();localStorage.setItem('gen_last',JSON.stringify(snapshot));}catch(e){}},3500); // helper: test push function availability
-async function testFn(){try{const r=await fetch('/.netlify/functions/pushJson',{method:'OPTIONS'});return r.ok}catch{return false}}testFn().then(ok=>{if(!ok)console.log('function maybe not available for OPTIONS')});</script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Masjid JSON Generator</title>
+<style>
+:root{--bg:#07101a;--panel:#0b1722;--muted:#98a5c0;--text:#eaf6ff;--accent:#06b6d4}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Roboto,Arial}
+a{color:var(--accent)}.wrap{max-width:980px;margin:28px auto;padding:20px}.card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border:1px solid #ffffff12;border-radius:12px;padding:18px;margin-bottom:14px}.row{display:flex;gap:12px;flex-wrap:wrap}.col{flex:1;min-width:160px}.field{display:flex;flex-direction:column;margin-bottom:10px}.field label{font-weight:700;color:#9feaf1;margin-bottom:6px}.input,textarea,select{padding:10px;border-radius:8px;border:1px solid #ffffff12;background:#071c26;color:var(--text)}textarea{min-height:100px;resize:vertical}.btn{background:linear-gradient(90deg,#0f2a33,#07323f);border:1px solid #ffffff18;padding:10px 14px;border-radius:10px;color:var(--text);cursor:pointer;font-weight:700}.btn.prim{background:linear-gradient(90deg,#06b6d4,#06a59f)}.right{display:flex;gap:10px;align-items:center}.small{font-size:.9rem;color:var(--muted)}footer{margin-top:14px;color:var(--muted);font-size:.9rem}.pill{display:inline-block;padding:6px 10px;background:#071928;border-radius:8px;border:1px solid #ffffff10}.hide{display:none}.notice{background:#05202a;padding:10px;border-radius:8px;border:1px solid #ffffff10;margin-bottom:12px}.json-btn{position:fixed;left:14px;bottom:14px;border-radius:999px;padding:12px 16px;background:#0b2b2f;z-index:60}.push-area{position:fixed;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px;z-index:60}.push-area button{min-width:170px}.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:9999}.modal .box{background:var(--panel);padding:18px;border-radius:10px;border:1px solid #ffffff10;width:90%;max-width:520px}.toast{position:fixed;left:50%;transform:translateX(-50%);top:18px;background:#063036;padding:10px 14px;border-radius:8px;display:none}.placeholder{color:#e0e0e0;opacity:.9}::placeholder{color:#e0e0e0;opacity:.9}
+/* ensure PUSH button visible on small screens and make placeholder text bright */
+@media(max-width:768px){.row{flex-direction:column}.push-area{position:static;flex-direction:row;justify-content:space-between}.push-area button{flex:1}}
+/* mobile: ensure PushSecret visible */
+@media(max-width:480px){#btnSetPushSecret{display:block!important;position:relative!important;bottom:auto!important;right:auto!important;margin-top:6px;width:100%}}
+/* make keuangan placeholders clearly visible */
+#keuPenerimaan::placeholder,#keuPengeluaran::placeholder,#keuSaldo::placeholder{color:#f0f6fb;opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 style="text-align:center;color:var(--accent);margin:6px 0 18px">▶ Masjid JSON Generator</h1>
+
+  <div class="card">
+    <div class="notice small">Isi data masjid lalu <strong>Push ke GitHub</strong> untuk perbarui file JSON di repo <code>data-masjid</code>. Pastikan <em>PUSH secret</em> sudah diset di Netlify functions.</div>
+    <div class="row">
+      <div class="col">
+        <div class="field"><label>Nama Masjid</label><input id="name" class="input" placeholder="Masjid At Taubah"></div>
+        <div class="field"><label>Alamat</label><input id="addr" class="input" placeholder="Perum T Murni RW-15"></div>
+        <div class="field"><label>Latitude (opsional)</label><input id="lat" class="input" placeholder="Latitude (boleh kosong)"></div>
+        <div class="field"><label>Longitude (opsional)</label><input id="lon" class="input" placeholder="Longitude (boleh kosong)"></div>
+        <div class="field"><label>ID Kota MyQuran</label><input id="myqCityId" class="input" placeholder="1203"></div>
+      </div>
+      <div class="col">
+        <div class="field"><label>Slide gambar (URL)</label><input id="slideSrc" class="input" placeholder="https://...jpg"></div>
+        <div class="field"><label>Caption slide</label><input id="slideCaption" class="input" placeholder="Judul slide"></div>
+        <div class="field"><label>Schedule</label><select id="slideSchedule" class="input"><option value="always">Always</option><option value="weekly">Weekly</option><option value="date">Specific date</option></select></div>
+        <div class="field"><label>Adzan beep seconds</label><input id="adzanBeepSeconds" class="input" placeholder="5"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 10px">Data Keuangan (opsional)</h3>
+    <div class="row">
+      <div class="col"><div class="field"><label>Tahun</label><input id="keuYear" class="input" placeholder="2025"></div></div>
+      <div class="col"><div class="field"><label>Bulan</label><input id="keuMonth" class="input" placeholder="01"></div></div>
+      <div class="col"><div class="field"><label>Penerimaan</label><input id="keuPenerimaan" class="input" placeholder="1500000"></div></div>
+    </div>
+    <div class="row">
+      <div class="col"><div class="field"><label>Pengeluaran</label><input id="keuPengeluaran" class="input" placeholder="500000"></div></div>
+      <div class="col"><div class="field"><label>Saldo</label><input id="keuSaldo" class="input" placeholder="1000000"></div></div>
+    </div>
+    <div class="field"><label>Hadist (opsional)</label><textarea id="keuHadist" placeholder="Dan apa saja yang kamu infakkan..."></textarea></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 10px">Auth / Token (opsional)</h3>
+    <div class="field"><label>Token (untuk file auth di JSON)</label><input id="authToken" class="input" placeholder="MATTAUBAH"></div>
+    <div class="small">Token ini harus juga ada di <code>valid-tokens.json</code> pada aplikasi jam masjid agar data diterima.</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button id="btnShowJson" class="btn">Tampilkan JSON (tab baru)</button>
+      <button id="btnPush" class="btn prim">Push ke GitHub</button>
+      <button id="btnSendWA" class="btn">Kirim ke WA Admin</button>
+      <button id="btnSetPushSecret" class="btn" style="display:none">Set PUSH Secret</button>
+    </div>
+    <div id="status" class="small" style="margin-top:10px"></div>
+  </div>
+
+  <footer>Uploaded ke GitHub → file target biasanya: <code>data-masjid/jammasjid_backup_YYYY-MM-DD.json</code>. Setelah push, aplikasi jam masjid bisa auto-fetch dari raw GitHub atau menggunakan sync yang sudah kita implement.</footer>
+</div>
+
+<!-- push area & json floating button -->
+<button class="json-btn btn" id="btnQuickJson">JSON</button>
+<div class="push-area">
+  <button id="btnSetPushSecretFixed" class="btn" style="display:none">Set PUSH Secret</button>
+</div>
+
+<!-- modal push secret -->
+<div class="modal" id="modalSecret">
+  <div class="box">
+    <h3>Set PUSH Secret</h3>
+    <div class="field"><label>Secret (x-push-secret)</label><input id="pushSecretInput" class="input" placeholder="isi secret untuk endpoint functions"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button id="pushSecretSave" class="btn prim">Simpan</button><button id="pushSecretCancel" class="btn">Batal</button></div>
+  </div>
+</div>
+
+<!-- modal toast -->
+<div class="modal" id="modalToast"><div class="box"><div id="toastText">...</div></div></div>
+<div class="toast" id="toastSmall">...</div>
+
+<script>
+/* helpers */
+const el=id=>document.getElementById(id);
+const showSmallToast=(txt,ms=2200)=>{const t=el('toastSmall');t.textContent=txt;t.style.display='block';setTimeout(()=>t.style.display='none',ms)};
+const showModalToast=(txt,ms=2200)=>{const m=el('modalToast');el('toastText').textContent=txt;m.style.display='flex';setTimeout(()=>m.style.display='none',ms)};
+
+/* read values */
+const getVal=id=>el(id).value.trim();
+
+/* build JSON payload */
+const buildObj=()=> {
+  const meta={name:getVal('name')||'Masjid',addr:getVal('addr')||'',lat:getVal('lat')||null,lon:getVal('lon')||null,myqCityId: parseInt(getVal('myqCityId')||'0')||703};
+  const slides=[];
+  const ssrc=getVal('slideSrc');
+  if(ssrc){ slides.push({src:ssrc,caption:getVal('slideCaption')||'',schedule:{type:getVal('slideSchedule')||'always'}}) }
+  const keuYear=getVal('keuYear');
+  const keuangan = keuYear ? [{year:keuYear,month:getVal('keuMonth')||'01',penerimaan:parseInt(getVal('keuPenerimaan')||0),pengeluaran:parseInt(getVal('keuPengeluaran')||0),saldo:parseInt(getVal('keuSaldo')||0)}] : [];
+  const payload={
+    meta,slides,
+    rt:{content:[getVal('keuHadist')||'Selamat datang di Masjid']},
+    offsets:{},iqamah:{},
+    notify:{notifySeconds:parseInt(getVal('adzanBeepSeconds')||240),startedMinutes:10},
+    keuangan,keuangan_meta:{hadist:getVal('keuHadist')||''},
+    auth:{token:getVal('authToken')||'',ts:Date.now()},
+    message:`Update jammasjid via generator ${new Date().toISOString()}`
+  };
+  return payload;
+};
+
+/* open JSON in new tab */
+const openJsonTab=()=> {
+  try{
+    const j=buildObj();
+    const blob=new Blob([JSON.stringify(j,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    window.open(url,'_blank');
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+  }catch(e){showSmallToast('Gagal tampilkan JSON');console.error(e)}
+}
+el('btnShowJson').onclick=openJsonTab;
+el('btnQuickJson').onclick=openJsonTab;
+
+/* status */
+function updateStatus(t){el('status').textContent=t}
+
+/* push to Netlify function which will push to GitHub */
+async function pushToGit(){
+  try{
+    updateStatus('Mempersiapkan JSON...');
+    const j=buildObj();
+    const path='jammasjid_backup_'+(new Date()).toISOString().slice(0,10)+'.json';
+    const body={path,content:JSON.stringify(j),message:'Update jammasjid via generator'};
+    updateStatus('Mengirim ke Netlify function...');
+    const secret = localStorage.getItem('PUSH_SECRET')||'';
+    const r = await fetch('/.netlify/functions/pushJson',{method:'POST',headers:{'content-type':'application/json','x-push-secret':secret||''},body:JSON.stringify(body)});
+    const text = await r.text();
+    // try parse json if possible
+    let parsed;
+    try{parsed = JSON.parse(text)}catch{}
+    if(!r.ok){
+      // show helpful error
+      const errMsg = (parsed && parsed.error) ? (parsed.error + (parsed.details? (' - '+JSON.stringify(parsed.details)) : '')) : text || `HTTP ${r.status}`;
+      throw new Error(errMsg);
+    }
+    updateStatus('Push sukses');
+    showModalToast('Push sukses: OK');
+    return parsed || text;
+  }catch(e){
+    console.error(e);
+    updateStatus('Push error');
+    showModalToast('Push error: '+(e.message||e).toString(),4000);
+    throw e;
+  }
+}
+
+/* confirm and push */
+el('btnPush').onclick=()=>{
+  if(!confirm('Yakin mau push ke GitHub?')) return;
+  pushToGit().catch(()=>{});
+}
+
+/* send WA admin (simple) */
+el('btnSendWA').onclick=()=>{
+  try{
+    const j=buildObj();
+    const raw=encodeURIComponent(JSON.stringify(j));
+    const waUrl='https://wa.me/?text='+raw;
+    window.open(waUrl,'_blank');
+  }catch(e){showSmallToast('Gagal kirim WA')}
+}
+
+/* push secret modal handlers */
+el('btnSetPushSecret').onclick=()=>el('modalSecret').style.display='flex';
+el('btnSetPushSecretFixed').onclick=()=>el('modalSecret').style.display='flex';
+el('pushSecretCancel').onclick=()=>el('modalSecret').style.display='none';
+el('pushSecretSave').onclick=()=>{
+  const v=getVal('pushSecretInput');
+  if(!v){alert('Isi secret dulu');return}
+  localStorage.setItem('PUSH_SECRET',v);
+  el('modalSecret').style.display='none';
+  showModalToast('Secret tersimpan');
+  // show the buttons in UI
+  el('btnSetPushSecret').style.display='inline-block';
+  el('btnSetPushSecretFixed').style.display='inline-block';
+};
+
+/* show buttons if localStorage has push secret (UX) */
+(function(){
+  if(localStorage.getItem('PUSH_SECRET')){
+    el('btnSetPushSecret').style.display='inline-block';
+    el('btnSetPushSecretFixed').style.display='inline-block';
+  } else {
+    // show them anyway so user can set secret
+    el('btnSetPushSecret').style.display='inline-block';
+    el('btnSetPushSecretFixed').style.display='inline-block';
+  }
+})();
+
+/* load last saved form values */
+(function(){
+  try{
+    const s=localStorage.getItem('gen_last');
+    if(!s) return;
+    const o=JSON.parse(s);
+    if(o.meta){
+      el('name').value=o.meta.name||'';
+      el('addr').value=o.meta.addr||'';
+      el('lat').value=o.meta.lat||'';
+      el('lon').value=o.meta.lon||'';
+      el('myqCityId').value=o.meta.myqCityId||'';
+    }
+    if(o.slides && o.slides[0]){
+      el('slideSrc').value=o.slides[0].src||'';
+      el('slideCaption').value=o.slides[0].caption||'';
+      if(o.slides[0].schedule && o.slides[0].schedule.type) el('slideSchedule').value=o.slides[0].schedule.type;
+    }
+    if(o.keuangan && o.keuangan[0]){
+      el('keuYear').value=o.keuangan[0].year||'';
+      el('keuMonth').value=o.keuangan[0].month||'';
+      el('keuPenerimaan').value=o.keuangan[0].penerimaan||'';
+      el('keuPengeluaran').value=o.keuangan[0].pengeluaran||'';
+      el('keuSaldo').value=o.keuangan[0].saldo||'';
+    }
+    if(o.auth) el('authToken').value=o.auth.token||'';
+    if(o.notify && o.notify.notifySeconds) el('adzanBeepSeconds').value=o.notify.notifySeconds;
+    if(o.keuangan_meta && o.keuangan_meta.hadist) el('keuHadist').value=o.keuangan_meta.hadist||'';
+  }catch(e){}
+})();
+
+/* autosave current form to localStorage every few seconds */
+setInterval(()=>{
+  try{
+    const snapshot=buildObj();
+    localStorage.setItem('gen_last',JSON.stringify(snapshot));
+  }catch(e){}
+},3500);
+
+/* test function by OPTIONS (helps detect if function exists and CORS) */
+async function testFn(){
+  try{
+    const r = await fetch('/.netlify/functions/pushJson',{method:'OPTIONS'});
+    return r.ok;
+  }catch{return false}
+}
+testFn().then(ok=>{
+  if(!ok) console.log('function maybe not available for OPTIONS or blocked');
+});
+
+/* export functions to window for debugging */
+window._jsongen={buildObj,pushToGit,openJsonTab};
+
+/* keyboard convenience: Ctrl+S to open JSON in new tab (dev) */
+window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();openJsonTab()}});
+
+</script>
+</body>
+</html>
