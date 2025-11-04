@@ -342,4 +342,129 @@ document.addEventListener('input', (e)=>{ savePersist(); });
 
 /* ---------- escape helper end ---------- */
 </script>
+  <!-- PUSH & WA TOOLS (paste before </body>) -->
+<style>#pushBar{position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;flex-direction:column;gap:8px}.tiny-btn{background:#0f1a2d;border:1px solid #ffffff18;padding:.55rem .8rem;border-radius:10px;color:#bfeed6;font-weight:700;cursor:pointer}.push-btn{background:linear-gradient(90deg,#06b46b,#059669);color:#001;border:1px solid #0a2f18}.wa-btn{background:linear-gradient(90deg,#10b981,#059669);color:#001}.reset-btn{background:#112;color:#b7c6e6}</style>
+<div id="pushBar">
+  <button id="btnSecret" class="tiny-btn">Set PUSH Secret</button>
+  <button id="btnGenerate" class="tiny-btn">Tampilkan JSON</button>
+  <button id="btnPush" class="tiny-btn push-btn">Push ke GitHub</button>
+  <button id="btnWA" class="tiny-btn wa-btn">Kirim ke WA Admin</button>
+  <button id="btnReset" class="tiny-btn reset-btn">Reset Form</button>
+  <div id="pushStatus" style="color:#cfeccf;font-size:.9rem;margin-top:6px"></div>
+</div>
+<script>
+(function(){
+  const WA_PHONE='6281315161561';
+  const PUSH_ENDPOINT='/.netlify/functions/pushJson';
+  const LS_KEY='PUSH_SECRET_JG';
+  const fallbackJSONExample = {"meta":{"name":"Masjid At Taubah","addr":"Perum T Murni RW-15","lat":null,"lon":null,"myqCityId":1203},"slides":[{"src":"https://wisatamuliainsani.com/wp-content/uploads/2024/07/Mengintip-Keindahan-Kota-Thaif-yang-Penuh-dengan-Sejarah-Wisata-Mulia-Insani-scaled.jpg","caption":"Thaif","schedule":{"type":"always"}}],"rt":{"content":["Selamat datang di Masjid At Taubah"]},"offsets":{"Fajr":0,"Sunrise":0,"Dhuhr":0,"Asr":0,"Maghrib":0,"Isha":0},"iqamah":{"Fajr":10,"Dhuhr":10,"Asr":10,"Maghrib":5,"Isha":10},"notify":{"notifySeconds":240,"startedMinutes":10},"adzan":{"adzanBeepSeconds":5,"adzanPattern":"standard"},"keuangan":[],"keuangan_meta":{"hadist":"Dan apa saja yang kamu infakkan, Allah akan menggantinya..."},"auth":{"token":"MATTAUBAH","ts":Date.now()}};
+
+  function $(s, root=document){return root.querySelector(s)}
+  function $all(s, root=document){return Array.from((root||document).querySelectorAll(s))}
+
+  $('#btnSecret').onclick=()=>{
+    const prev=localStorage.getItem(LS_KEY)||'';
+    const v=prompt('Masukkan PUSH_SECRET (simpan juga di Netlify env):', prev) || '';
+    if(!v) return alert('Tidak disimpan'); localStorage.setItem(LS_KEY,v); alert('PUSH_SECRET tersimpan (localStorage).');
+  };
+
+  $('#btnReset').onclick=()=>{ if(!confirm('Reset semua input?')) return; const inputs=$all('input,textarea,select'); inputs.forEach(i=>{ if(i.type==='checkbox'||i.type==='radio') i.checked=false; else i.value=''; }); localStorage.removeItem(LS_KEY); alert('Form direset. PUSH_SECRET lokal dihapus.'); };
+
+  function buildJSON(){
+    try{
+      const metaName = ($('#meta_name')||{value:''}).value || fallbackJSONExample.meta.name;
+      const metaAddr = ($('#meta_addr')||{value:''}).value || fallbackJSONExample.meta.addr;
+      const lat = ($('#meta_lat')||{value:''}).value;
+      const lon = ($('#meta_lon')||{value:''}).value;
+      const myq = ($('#meta_myq')||{value:''}).value || fallbackJSONExample.meta.myqCityId;
+      const meta = { name: metaName, addr: metaAddr, lat: lat?Number(lat):null, lon: lon?Number(lon):null, myqCityId: Number(myq) || fallbackJSONExample.meta.myqCityId };
+
+      const slides = [];
+      const slideItems = $all('#slides_list .slide-item');
+      if(slideItems.length){
+        slideItems.forEach(si=>{
+          const src=(si.querySelector('.slide-src')||{value:''}).value;
+          const caption=(si.querySelector('.slide-caption')||{value:''}).value;
+          const scheduleSel=(si.querySelector('.slide-schedule')||{value:'always'}).value;
+          const sObj = { type: scheduleSel };
+          if(scheduleSel==='weekly'){ const days=$all('.slide-weekday:checked', si).map(ch=>Number(ch.value)); if(days.length) sObj.days=days; }
+          if(src) slides.push({src,caption,schedule:sObj});
+        });
+      } else slides.push(...fallbackJSONExample.slides);
+
+      const rtText = ($('#rt_content')||{value:''}).value.trim();
+      const rt = { content: rtText ? rtText.split(/\r?\n/).map(s=>s.trim()).filter(Boolean) : (fallbackJSONExample.rt.content||[]) };
+
+      const offsets = {};
+      ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'].forEach(k=>{
+        const el = $(`#off_${k}`);
+        offsets[k]= el && el.value!=='' ? Number(el.value) : 0;
+      });
+
+      const iqamah = {};
+      ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(k=>{
+        const el = $(`#iq_${k}`);
+        iqamah[k]= el && el.value!=='' ? Number(el.value) : (fallbackJSONExample.iqamah[k]||10);
+      });
+
+      const notify = { notifySeconds: Number($('#notify_seconds')?.value||fallbackJSONExample.notify.notifySeconds), startedMinutes: Number($('#notify_startedMinutes')?.value||fallbackJSONExample.notify.startedMinutes) };
+      const adzan = { adzanBeepSeconds: Number($('#adzan_beepSeconds')?.value||fallbackJSONExample.adzan.adzanBeepSeconds), adzanPattern: ($('#adzan_pattern')||{value:'standard'}).value || 'standard' };
+
+      const keu = [];
+      $all('.keu-row').forEach(r=>{
+        const y = r.querySelector('.keu-year')?.value || '';
+        const m = r.querySelector('.keu-month')?.value || '';
+        const p = Number(r.querySelector('.keu-penerimaan')?.value||0);
+        const q = Number(r.querySelector('.keu-pengeluaran')?.value||0);
+        const s = r.querySelector('.keu-saldo')?.value;
+        keu.push({ year: Number(y)||new Date().getFullYear(), month: String(m).padStart(2,'0'), penerimaan: p, pengeluaran: q, saldo: s?Number(s):(p-q) });
+      });
+
+      const keu_meta = { hadist: ($('#keu_hadist')?.value) || fallbackJSONExample.keuangan_meta.hadist };
+      const auth = { token: ($('#auth_token')?.value) || fallbackJSONExample.auth.token, ts: Date.now() };
+
+      const out = { meta, slides, rt, offsets, iqamah, notify, adzan, keuangan: keu, keuangan_meta: keu_meta, auth };
+      return out;
+    }catch(e){console.error(e); return fallbackJSONExample;}
+  }
+
+  $('#btnGenerate').onclick=()=>{
+    const j=buildJSON(); const s=JSON.stringify(j,null,2);
+    const w = window.open('', '_blank','noopener'); w.document.body.style.background='#0b1220'; w.document.body.style.color='#e9f1ff';
+    const pre = w.document.createElement('pre'); pre.style.whiteSpace='pre-wrap'; pre.style.fontSize='13px'; pre.textContent=s; w.document.title='Generated JSON'; w.document.body.appendChild(pre);
+  };
+
+  async function doPush(){
+    const secret = localStorage.getItem(LS_KEY);
+    if(!secret){
+      alert('PUSH_SECRET belum disimpan. Klik "Set PUSH Secret" lalu masukkan secret yang sama seperti di Netlify environment variable.');
+      return;
+    }
+    const payloadObj = buildJSON();
+    const contentStr = JSON.stringify(payloadObj, null, 2);
+    $('#pushStatus').textContent='Mengirim ke GitHub...';
+    try{
+      const res = await fetch(PUSH_ENDPOINT, {
+        method:'POST', headers:{ 'Content-Type':'application/json', 'x-push-secret': secret }, body: JSON.stringify({ content: contentStr, path: undefined, message: `Update jammasjid json via generator (${new Date().toISOString()})` })
+      });
+      const txt = await res.text();
+      if(!res.ok) throw new Error(txt||`HTTP ${res.status}`);
+      const j = JSON.parse(txt);
+      $('#pushStatus').textContent='✅ Sukses: '+(j.url||j.commit||'OK');
+      alert('Push sukses.\nURL: '+(j.url||j.commit||'OK'));
+    }catch(err){ console.error(err); $('#pushStatus').textContent='❌ Gagal: '+String(err).slice(0,120); alert('Push error: '+String(err)); }
+  }
+  $('#btnPush').onclick=doPush;
+
+  $('#btnWA').onclick=()=>{
+    const j=buildJSON(); const s=encodeURIComponent(JSON.stringify(j,null,2));
+    const waUrl=`https://wa.me/${WA_PHONE}?text=${encodeURIComponent('JSON hasil generator:%0A')}${s}`;
+    window.open(waUrl,'_blank');
+  };
+
+  async function checkFunction(){ try{ const r=await fetch(PUSH_ENDPOINT,{method:'GET'}); const t=await r.text(); console.log('Fn GET:', r.status,t.slice(0,200)); }catch(e){console.warn('Fn GET err',e);} }
+  checkFunction();
+})();
+</script>
+
 </body></html>
