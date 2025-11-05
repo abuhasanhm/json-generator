@@ -1,88 +1,456 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Masjid JSON Generator (full)</title><style>:root{--bg:#07101a;--panel:#0b1722;--muted:#98a5c0;--text:#eaf6ff;--accent:#06b6d4}*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Roboto,Arial}a{color:var(--accent)}.wrap{max-width:1100px;margin:18px auto;padding:16px}.card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border:1px solid #ffffff12;border-radius:12px;padding:14px;margin-bottom:12px}.row{display:flex;gap:10px;flex-wrap:wrap}.col{flex:1;min-width:220px}.field{display:flex;flex-direction:column;margin-bottom:10px}.field label{font-weight:700;color:#9feaf1;margin-bottom:6px}.input,textarea,select{padding:10px;border-radius:8px;border:1px solid #ffffff12;background:#071c26;color:var(--text)}textarea{min-height:80px;resize:vertical}.btn{background:linear-gradient(90deg,#0f2a33,#07323f);border:1px solid #ffffff18;padding:8px 12px;border-radius:10px;color:var(--text);cursor:pointer;font-weight:700}.btn.prim{background:linear-gradient(90deg,#06b6d4,#06a59f)}.small{font-size:.9rem;color:var(--muted)}footer{margin-top:14px;color:var(--muted);font-size:.9rem}.pill{display:inline-block;padding:6px 10px;background:#071928;border-radius:8px;border:1px solid #ffffff10}.json-btn{position:fixed;left:12px;bottom:12px;border-radius:999px;padding:10px 14px;background:#0b2b2f;z-index:60}.push-area{position:fixed;right:12px;bottom:12px;display:flex;flex-direction:column;gap:8px;z-index:60}.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:9999}.modal .box{background:var(--panel);padding:12px;border-radius:10px;border:1px solid #ffffff10;width:92%;max-width:760px}.toast{position:fixed;left:50%;transform:translateX(-50%);top:18px;background:#063036;padding:10px 14px;border-radius:8px;display:none}.placeholder{color:#e0e0e0;opacity:.9}::placeholder{color:#e0e0e0;opacity:.9}table{width:100%;border-collapse:collapse}td,th{padding:6px;border-bottom:1px dashed #ffffff12}.control-row{display:flex;gap:8px;align-items:center}.mini{padding:6px 8px;border-radius:8px;background:#0b1b24;border:1px solid #ffffff12}.center{display:flex;align-items:center;gap:8px}.hide{display:none}@media(max-width:900px){.row{flex-direction:column}.push-area{position:static}.push-area button{flex:1}}@media(max-width:480px){#btnSetPushSecret{display:block!important;width:100%!important;margin-top:6px}}</style></head><body>
+<!doctype html><html lang="id"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Masjid JSON Generator</title>
+<style>
+:root{
+  --bg:#0b1220;
+  --panel:#0f1a2e;
+  --muted:#98a5c0;
+  --text:#eaf6ff;
+  --accent:#10b981;
+  --green:#10b981;
+  --green-dark:#059669;
+  --line:#ffffff18;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Roboto,Arial;line-height:1.5}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Ad Banner */
+.ad-banner{
+  display:block;
+  width:100%;
+  max-width:100%;
+  margin:0 auto 20px;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+  transition:transform .3s ease;
+}
+.ad-banner:hover{transform:scale(1.02)}
+.ad-banner img{width:100%;height:auto;display:block}
+
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+h1{
+  text-align:center;
+  color:var(--accent);
+  margin:0 0 20px;
+  font-size:clamp(20px, 5vw, 28px);
+  text-shadow:0 2px 10px rgba(16,185,129,.3);
+}
+
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 18px 50px rgba(0,0,0,.3);
+}
+
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.col{flex:1;min-width:100%}
+
+@media(min-width:768px){
+  .col{min-width:280px}
+  .wrap{padding:20px}
+}
+
+.field{display:flex;flex-direction:column;margin-bottom:12px}
+.field label{
+  font-weight:700;
+  color:var(--accent);
+  margin-bottom:6px;
+  font-size:14px;
+}
+
+.input,textarea,select{
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid #172033;
+  background:#081426;
+  color:var(--text);
+  font-size:15px;
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+.input:focus,textarea:focus,select:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(16,185,129,.1);
+}
+
+textarea{min-height:80px;resize:vertical;font-family:monospace}
+
+.btn{
+  background:#0f1a2d;
+  border:1px solid #ffffff22;
+  padding:10px 16px;
+  border-radius:10px;
+  color:var(--text);
+  cursor:pointer;
+  font-weight:700;
+  font-size:14px;
+  transition:all .2s ease;
+  white-space:nowrap;
+}
+.btn:hover{
+  background:#1a2844;
+  transform:translateY(-1px);
+}
+.btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.btn.prim{
+  background:var(--accent);
+  border-color:var(--green-dark);
+  color:#fff;
+  box-shadow:0 2px 8px rgba(16,185,129,.3);
+}
+.btn.prim:hover{
+  background:var(--green-dark);
+  box-shadow:0 4px 12px rgba(16,185,129,.4);
+}
+
+.btn.success{
+  background:var(--accent);
+  animation:successPulse .5s ease;
+}
+
+@keyframes successPulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.05)}
+}
+
+.small{font-size:14px;color:var(--muted);line-height:1.4}
+.notice{
+  background:rgba(16,185,129,.05);
+  border:1px solid rgba(16,185,129,.2);
+  border-radius:8px;
+  padding:10px;
+  margin-bottom:12px;
+}
+
+footer{
+  margin-top:20px;
+  padding:16px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.pill{
+  display:inline-block;
+  padding:6px 10px;
+  background:rgba(255,255,255,.02);
+  border-radius:8px;
+  border:1px solid var(--line);
+  margin:2px;
+}
+
+.json-btn{
+  position:fixed;
+  left:12px;
+  bottom:12px;
+  border-radius:999px;
+  padding:10px 14px;
+  background:var(--accent);
+  color:#fff;
+  z-index:60;
+  box-shadow:0 4px 12px rgba(16,185,129,.4);
+}
+
+.push-area{
+  position:fixed;
+  right:12px;
+  bottom:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  z-index:60;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.7);
+  z-index:9999;
+}
+.modal .box{
+  background:var(--panel);
+  padding:20px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  width:92%;
+  max-width:500px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.modal h3{
+  color:var(--accent);
+  margin-bottom:16px;
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  top:18px;
+  background:var(--accent);
+  color:#fff;
+  padding:12px 20px;
+  border-radius:10px;
+  display:none;
+  box-shadow:0 4px 20px rgba(16,185,129,.4);
+  z-index:10000;
+  font-weight:600;
+}
+
+::placeholder{color:#98a5c0;opacity:.7}
+
+table{width:100%;border-collapse:collapse;margin-top:8px}
+td,th{
+  padding:8px;
+  border-bottom:1px solid var(--line);
+  text-align:left;
+}
+th{
+  color:var(--accent);
+  font-weight:700;
+}
+
+.control-row{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.mini{
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:13px;
+}
+
+.center{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.hide{display:none}
+
+code{
+  background:rgba(255,255,255,.05);
+  padding:2px 6px;
+  border-radius:4px;
+  font-family:monospace;
+  font-size:13px;
+  color:var(--accent);
+}
+
+h3{
+  color:var(--accent);
+  font-size:18px;
+  margin:0 0 12px;
+  padding-bottom:8px;
+  border-bottom:2px solid rgba(16,185,129,.2);
+}
+
+/* Loading spinner */
+.spinner{
+  display:inline-block;
+  width:14px;
+  height:14px;
+  border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+  margin-right:6px;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+/* Mobile responsive */
+@media(max-width:900px){
+  .row{flex-direction:column}
+  .push-area{
+    position:static;
+    margin-top:16px;
+    flex-direction:row;
+    flex-wrap:wrap;
+  }
+  .push-area button{flex:1;min-width:140px}
+  .json-btn{
+    position:static;
+    display:inline-block;
+    margin:16px auto;
+  }
+}
+
+@media(max-width:640px){
+  .wrap{padding:12px}
+  .card{padding:12px}
+  h1{margin-bottom:16px}
+  .input,textarea,select{font-size:16px} /* Prevent iOS zoom */
+  .control-row{flex-direction:column}
+  .control-row > *{width:100%}
+}
+</style>
+</head><body>
+
 <div class="wrap">
-<h1 style="text-align:center;color:var(--accent);margin:6px 0 14px">▶ Masjid JSON Generator (full)</h1>
+<!-- Ad Banner -->
+<a href="https://turkistan.id" target="_blank" rel="noopener" class="ad-banner">
+  <img src="https://files.catbox.moe/rs162j.png" alt="Turkistan.id" loading="lazy">
+</a>
+
+<h1>▶ Masjid JSON Generator</h1>
 
 <div class="card">
-<div class="small notice">Isi data lalu <strong>Push ke GitHub</strong>. Pastikan PUSH secret sudah diset di Netlify functions. <a id="linkKota" href="https://api.myquran.com/v2/sholat/kota/semua" target="_blank">Daftar kota (MyQuran)</a></div>
+<div class="small notice">Isi data lalu <strong>Push ke GitHub</strong>. Pastikan PUSH secret sudah diset di Netlify functions. <a id="linkKota" href="https://api.myquran.com/v2/sholat/kota/semua" target="_blank">Daftar kota MyQuran →</a></div>
+
 <div class="row">
 <div class="col">
 <div class="field"><label>Nama Masjid</label><input id="name" class="input" placeholder="Masjid Istiqlal"></div>
 <div class="field"><label>Alamat</label><input id="addr" class="input" placeholder="Jakarta"></div>
-<div class="field"><label>Latitude (opsional)</label><input id="lat" class="input" placeholder="Latitude (boleh kosong)"></div>
-<div class="field"><label>Longitude (opsional)</label><input id="lon" class="input" placeholder="Longitude (boleh kosong)"></div>
-<div class="field"><label>ID Kota MyQuran</label><div class="control-row"><input id="myqCityId" class="input" placeholder="1203"><button id="btnLookupCity" class="btn mini">Lookup</button></div><div id="cityName" class="small" style="margin-top:6px"></div></div>
+<div class="field"><label>Latitude (opsional)</label><input id="lat" class="input" type="number" step="any" placeholder="-6.200000"></div>
+<div class="field"><label>Longitude (opsional)</label><input id="lon" class="input" type="number" step="any" placeholder="106.816666"></div>
+<div class="field">
+  <label>ID Kota MyQuran</label>
+  <div class="control-row">
+    <input id="myqCityId" class="input" placeholder="1203" style="flex:1">
+    <button id="btnLookupCity" class="btn mini">🔍 Lookup</button>
+  </div>
+  <div id="cityName" class="small" style="margin-top:6px"></div>
+</div>
 </div>
 
 <div class="col">
-<div class="field"><label>Running Text (marquee) — tambah / hapus</label>
-<div id="rtList"></div>
-<div style="display:flex;gap:8px;margin-top:8px"><input id="rtInput" class="input" placeholder="Isi teks lalu Add"><button id="btnAddRT" class="btn mini">Tambah</button></div>
+<div class="field">
+  <label>Running Text (marquee)</label>
+  <div id="rtList"></div>
+  <div class="control-row" style="margin-top:8px">
+    <input id="rtInput" class="input" placeholder="Isi teks lalu klik Tambah" style="flex:1">
+    <button id="btnAddRT" class="btn mini">+ Tambah</button>
+  </div>
 </div>
 
-<div class="field"><label>Adzan beep seconds (default)</label><input id="defaultAdzanBeep" class="input" placeholder="5"></div>
-<div class="field"><label>Jeda Iqomah per sholat (menit) — isi 0 untuk non</label>
-<div style="display:flex;gap:8px"><input id="iqamahFajr" class="input" placeholder="Fajr 10"><input id="iqamahDhuhr" class="input" placeholder="Dhuhr 10"></div>
-<div style="display:flex;gap:8px;margin-top:6px"><input id="iqamahAsr" class="input" placeholder="Asr 10"><input id="iqamahMaghrib" class="input" placeholder="Maghrib 10"><input id="iqamahIsha" class="input" placeholder="Isha 10"></div>
+<div class="field"><label>Adzan Beep (detik)</label><input id="defaultAdzanBeep" class="input" placeholder="5" type="number"></div>
+
+<div class="field">
+  <label>Jeda Iqamah (menit) — 0 = tidak ada</label>
+  <div class="control-row">
+    <input id="iqamahFajr" class="input" placeholder="Subuh 10" type="number">
+    <input id="iqamahDhuhr" class="input" placeholder="Dzuhur 10" type="number">
+    <input id="iqamahAsr" class="input" placeholder="Ashar 10" type="number">
+  </div>
+  <div class="control-row" style="margin-top:6px">
+    <input id="iqamahMaghrib" class="input" placeholder="Maghrib 5" type="number">
+    <input id="iqamahIsha" class="input" placeholder="Isya 10" type="number">
+  </div>
 </div>
 </div>
 </div>
 </div>
 
 <div class="card">
-<h3 style="margin:6px 0">Slides — tambah / urut / hapus</h3>
+<h3>Slide Gambar</h3>
 <div id="slidesContainer"></div>
-<div style="display:flex;gap:8px;margin-top:8px">
-<input id="newSlideSrc" class="input" placeholder="https://...jpg"><input id="newSlideCaption" class="input" placeholder="caption"><select id="newSlideSchedule" class="input" style="width:160px"><option value="always">Always</option><option value="weekly">Weekly</option><option value="date">Date</option></select>
-<button id="btnAddSlide" class="btn prim">Tambah Slide</button>
+<div class="control-row" style="margin-top:12px">
+  <input id="newSlideSrc" class="input" placeholder="https://...jpg" style="flex:2">
+  <input id="newSlideCaption" class="input" placeholder="Caption" style="flex:1">
+  <select id="newSlideSchedule" class="input" style="width:120px">
+    <option value="always">Always</option>
+    <option value="weekly">Weekly</option>
+    <option value="date">Date</option>
+  </select>
+  <button id="btnAddSlide" class="btn prim">+ Tambah Slide</button>
 </div>
 </div>
 
 <div class="card">
-<h3 style="margin:6px 0">Koreksi Waktu (offset per sholat menit)</h3>
-<div style="display:flex;gap:8px;flex-wrap:wrap">
-<div class="field" style="min-width:120px"><label>Fajr</label><input id="offFajr" class="input" placeholder="0"></div>
-<div class="field" style="min-width:120px"><label>Dhuhr</label><input id="offDhuhr" class="input" placeholder="0"></div>
-<div class="field" style="min-width:120px"><label>Asr</label><input id="offAsr" class="input" placeholder="0"></div>
-<div class="field" style="min-width:120px"><label>Maghrib</label><input id="offMaghrib" class="input" placeholder="0"></div>
-<div class="field" style="min-width:120px"><label>Isha</label><input id="offIsha" class="input" placeholder="0"></div>
+<h3>Koreksi Waktu (offset menit)</h3>
+<div class="control-row">
+  <div class="field" style="min-width:100px"><label>Subuh</label><input id="offFajr" class="input" placeholder="0" type="number"></div>
+  <div class="field" style="min-width:100px"><label>Dzuhur</label><input id="offDhuhr" class="input" placeholder="0" type="number"></div>
+  <div class="field" style="min-width:100px"><label>Ashar</label><input id="offAsr" class="input" placeholder="0" type="number"></div>
+  <div class="field" style="min-width:100px"><label>Maghrib</label><input id="offMaghrib" class="input" placeholder="0" type="number"></div>
+  <div class="field" style="min-width:100px"><label>Isya</label><input id="offIsha" class="input" placeholder="0" type="number"></div>
 </div>
-<div class="small" style="margin-top:6px">Offset akan ditambahkan ke jadwal MyQuran sebelum ditampilkan.</div>
+<div class="small" style="margin-top:8px">Offset ditambahkan ke jadwal MyQuran sebelum ditampilkan</div>
 </div>
 
 <div class="card">
-<h3 style="margin:6px 0">Data Keuangan (multi-bulan)</h3>
+<h3>Data Keuangan</h3>
 <div id="keuTableWrap"></div>
-<div style="display:flex;gap:8px;margin-top:8px">
-<input id="kYear" class="input" placeholder="2025" style="width:120px"><input id="kMonth" class="input" placeholder="01" style="width:100px"><input id="kP" class="input" placeholder="penerimaan" style="width:140px"><input id="kQ" class="input" placeholder="pengeluaran" style="width:140px"><input id="kSaldo" class="input" placeholder="saldo" style="width:140px">
-<button id="btnAddKeu" class="btn mini">Tambah Data Keuangan</button>
+<div class="control-row" style="margin-top:12px">
+  <input id="kYear" class="input" placeholder="Tahun" style="width:100px" type="number">
+  <input id="kMonth" class="input" placeholder="Bulan" style="width:100px">
+  <input id="kP" class="input" placeholder="Penerimaan" style="flex:1" type="number">
+  <input id="kQ" class="input" placeholder="Pengeluaran" style="flex:1" type="number">
+  <input id="kSaldo" class="input" placeholder="Saldo" style="flex:1" type="number">
+  <button id="btnAddKeu" class="btn mini">+ Tambah</button>
 </div>
 </div>
 
 <div class="card">
-<h3 style="margin:6px 0">Auth / Token (opsional)</h3>
-<div class="field"><label>Token (untuk file auth di JSON)</label><input id="authToken" class="input" placeholder="MATTAUBAH"></div>
-<div class="small">Token harus ada juga di <code>valid-tokens.json</code> aplikasi jam masjid.</div>
+<h3>Auth / Token</h3>
+<div class="field">
+  <label>Token (untuk validasi di jam masjid)</label>
+  <input id="authToken" class="input" placeholder="MATTAUBAH">
+</div>
+<div class="small">Token harus ada juga di <code>valid-tokens.json</code> aplikasi jam masjid</div>
 </div>
 
 <div class="card">
-<div style="display:flex;gap:8px;flex-wrap:wrap">
-<button id="btnShowJson" class="btn">Tampilkan JSON (tab)</button>
-<button id="btnPush" class="btn prim">Push ke GitHub</button>
-<button id="btnSendWA" class="btn">Kirim ke WA</button>
-<button id="btnSetPushSecret" class="btn" style="display:none">Set PUSH Secret</button>
+<div class="control-row">
+  <button id="btnShowJson" class="btn">📄 Tampilkan JSON</button>
+  <button id="btnPush" class="btn prim">🚀 Push ke GitHub</button>
+  <button id="btnSendWA" class="btn">💬 Kirim ke WA</button>
+  <button id="btnSetPushSecret" class="btn" style="display:none">🔐 Set PUSH Secret</button>
 </div>
-<div id="status" class="small" style="margin-top:8px"></div>
-</div>
-
-<footer class="small">File target: <code>data-masjid/jammasjid_backup_YYYY-MM-DD.json</code>. Setelah push, aplikasi jam masjid bisa auto-fetch dari RAW GitHub atau menggunakan sync. Link daftar kota MyQuran: <a href="https://api.myquran.com/v2/sholat/kota/semua" target="_blank">https://api.myquran.com/v2/sholat/kota/semua</a>.</footer>
+<div id="status" class="small" style="margin-top:12px;font-weight:600"></div>
 </div>
 
-<button class="json-btn btn" id="btnQuickJson">JSON</button>
-<div class="push-area"><button id="btnSetPushSecretFixed" class="btn" style="display:none">Set PUSH Secret</button></div>
+<footer class="small">
+  <strong>File target:</strong> <code>data-masjid/jammasjid_backup_YYYY-MM-DD.json</code><br>
+  Setelah push, aplikasi jam masjid bisa auto-fetch dari RAW GitHub.<br>
+  <a href="https://api.myquran.com/v2/sholat/kota/semua" target="_blank">Daftar kota MyQuran →</a>
+</footer>
+</div>
 
-<div class="modal" id="modalSecret"><div class="box"><h3>Set PUSH Secret</h3><div class="field"><label>Secret (x-push-secret)</label><input id="pushSecretInput" class="input" placeholder="isi secret untuk endpoint functions"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button id="pushSecretSave" class="btn prim">Simpan</button><button id="pushSecretCancel" class="btn">Batal</button></div></div></div>
+<button class="json-btn btn" id="btnQuickJson">📄 JSON</button>
 
-<div class="modal" id="modalToast"><div class="box"><div id="toastText">...</div></div></div>
+<div class="push-area">
+  <button id="btnSetPushSecretFixed" class="btn" style="display:none">🔐 Set Secret</button>
+</div>
+
+<div class="modal" id="modalSecret">
+  <div class="box">
+    <h3>Set PUSH Secret</h3>
+    <div class="field">
+      <label>Secret (x-push-secret)</label>
+      <input id="pushSecretInput" class="input" placeholder="Masukkan secret untuk Netlify function">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button id="pushSecretCancel" class="btn">Batal</button>
+      <button id="pushSecretSave" class="btn prim">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalToast">
+  <div class="box">
+    <div id="toastText" style="text-align:center;font-weight:600">...</div>
+  </div>
+</div>
+
 <div class="toast" id="toastSmall">...</div>
 
 <script>
@@ -93,7 +461,7 @@ const showModal=(t,ms=2200)=>{try{document.getElementById('toastText').textConte
 
 /* storage keys */
 const K='gen_last_v2', SL='gen_slides', RT='gen_rt', KEU='gen_keu', META='gen_meta', RT_DEFAULT='gen_rt_default';
-const AUTH_KEY='GEN_AUTH'; // localStorage key for saved token
+const AUTH_KEY='GEN_AUTH';
 const VALID_TOKENS_URL='https://raw.githubusercontent.com/abuhasanhm/json-generator/refs/heads/main/jsongenerator/valid-tokens.json';
 const GAS_URL='https://script.google.com/macros/s/AKfycbzyKnJsfIJUyI8P2H8vkrJtN_dSfOUys6beUQe88QfSzRXXPyE3wF2sWbIYAROnlTiV/exec';
 
@@ -106,12 +474,12 @@ function renderRT(){
   const list=readJSON(RT,[]);
   const wrap=document.createElement('div');
   list.forEach((t,i)=>{
-    const row=document.createElement('div');row.style.display='flex';row.style.justifyContent='space-between';row.style.margin='6px 0';
-    const span=document.createElement('div');span.textContent=t;span.className='small';
-    const btns=document.createElement('div');
+    const row=document.createElement('div');row.style.display='flex';row.style.justifyContent='space-between';row.style.alignItems='center';row.style.margin='6px 0';row.style.padding='8px';row.style.background='rgba(255,255,255,.02)';row.style.borderRadius='8px';
+    const span=document.createElement('div');span.textContent=t;span.className='small';span.style.flex='1';
+    const btns=document.createElement('div');btns.style.display='flex';btns.style.gap='4px';
     const up=document.createElement('button');up.textContent='▲';up.className='btn mini';up.onclick=()=>{if(i>0){list.splice(i-1,0,list.splice(i,1)[0]);writeJSON(RT,list);renderRT()}};
     const down=document.createElement('button');down.textContent='▼';down.className='btn mini';down.onclick=()=>{if(i<list.length-1){list.splice(i+1,0,list.splice(i,1)[0]);writeJSON(RT,list);renderRT()}};
-    const del=document.createElement('button');del.textContent='Hapus';del.className='btn';del.onclick=()=>{if(confirm('Hapus teks ini?')){list.splice(i,1);writeJSON(RT,list);renderRT()}};
+    const del=document.createElement('button');del.textContent='🗑️';del.className='btn mini';del.onclick=()=>{if(confirm('Hapus teks ini?')){list.splice(i,1);writeJSON(RT,list);renderRT()}};
     btns.append(up,down,del);row.append(span,btns);wrap.appendChild(row);
   });
   const container=$('rtList');container.innerHTML='';container.appendChild(wrap);
@@ -121,21 +489,21 @@ $('btnAddRT').onclick=()=>{
   const arr=readJSON(RT,[]);arr.push(v);writeJSON(RT,arr);$('rtInput').value='';renderRT();saveSnapshot();
 };
 
-/* --- slides management (array of {src,caption,schedule}) --- */
+/* --- slides management --- */
 function renderSlides(){
   const slides=readJSON(SL,[]);
   const wrap=document.createElement('div');
   slides.forEach((s,i)=>{
-    const row=document.createElement('div');row.style.display='flex';row.style.gap='8px';row.style.alignItems='center';row.style.margin='8px 0';
-    const img=document.createElement('img');img.src=s.src;img.style.width='120px';img.style.height='60px';img.style.objectFit='cover';img.style.borderRadius='6px';
+    const row=document.createElement('div');row.style.display='flex';row.style.gap='12px';row.style.alignItems='center';row.style.margin='10px 0';row.style.padding='10px';row.style.background='rgba(255,255,255,.02)';row.style.borderRadius='10px';
+    const img=document.createElement('img');img.src=s.src;img.style.width='120px';img.style.height='70px';img.style.objectFit='cover';img.style.borderRadius='8px';img.style.border='1px solid var(--line)';
     const info=document.createElement('div');info.style.flex='1';
-    const cap=document.createElement('div');cap.textContent=s.caption||'(no caption)';cap.className='small';
-    const sch=document.createElement('div');sch.textContent='Schedule: '+(s.schedule?.type||'always');sch.className='small';
+    const cap=document.createElement('div');cap.textContent=s.caption||'(no caption)';cap.className='small';cap.style.fontWeight='600';
+    const sch=document.createElement('div');sch.textContent='Schedule: '+(s.schedule?.type||'always');sch.className='small';sch.style.opacity='.7';
     info.append(cap,sch);
-    const btns=document.createElement('div');
+    const btns=document.createElement('div');btns.style.display='flex';btns.style.gap='4px';btns.style.flexWrap='wrap';
     const up=document.createElement('button');up.textContent='▲';up.className='btn mini';up.onclick=()=>{if(i>0){slides.splice(i-1,0,slides.splice(i,1)[0]);writeJSON(SL,slides);renderSlides()}};
     const down=document.createElement('button');down.textContent='▼';down.className='btn mini';down.onclick=()=>{if(i<slides.length-1){slides.splice(i+1,0,slides.splice(i,1)[0]);writeJSON(SL,slides);renderSlides()}};
-    const del=document.createElement('button');del.textContent='Hapus';del.className='btn';del.onclick=()=>{if(confirm('Hapus slide?')){slides.splice(i,1);writeJSON(SL,slides);renderSlides()}};
+    const del=document.createElement('button');del.textContent='🗑️';del.className='btn mini';del.onclick=()=>{if(confirm('Hapus slide?')){slides.splice(i,1);writeJSON(SL,slides);renderSlides()}};
     btns.append(up,down,del);
     row.append(img,info,btns);
     wrap.appendChild(row);
@@ -145,18 +513,26 @@ function renderSlides(){
 $('btnAddSlide').onclick=()=>{
   const src=$('newSlideSrc').value.trim(); if(!src){showSmall('Isi URL gambar');return}
   const caption=$('newSlideCaption').value.trim(); const schedule={type:$('newSlideSchedule').value||'always'};
-  const arr=readJSON(SL,[]);arr.push({src,caption,schedule});writeJSON(SL,arr);$('newSlideSrc').value='';$('newSlideCaption').value='';renderSlides();saveSnapshot();
+  const arr=readJSON(SL,[]);arr.push({src,caption,schedule});writeJSON(SL,arr);$('newSlideSrc').value='';$('newSlideCaption').value='';renderSlides();saveSnapshot();showSmall('✅ Slide ditambahkan');
 };
 
 /* --- keuangan multi --- */
 function renderKeu(){
   const arr=readJSON(KEU,[]);
   const wrap=document.createElement('div');
-  if(!arr.length){wrap.innerHTML='<div class="small">Belum ada data keuangan</div>'}
+  if(!arr.length){wrap.innerHTML='<div class="small" style="text-align:center;padding:20px;opacity:.5">Belum ada data keuangan</div>'}
   else{
-    const tbl=document.createElement('table');const h=document.createElement('thead');h.innerHTML='<tr><th>Tahun</th><th>Bulan</th><th>Penerimaan</th><th>Pengeluaran</th><th>Saldo</th><th></th></tr>';tbl.appendChild(h);
+    const tbl=document.createElement('table');
+    const h=document.createElement('thead');h.innerHTML='<tr><th>Tahun</th><th>Bulan</th><th>Penerimaan</th><th>Pengeluaran</th><th>Saldo</th><th></th></tr>';tbl.appendChild(h);
     const b=document.createElement('tbody');
-    arr.forEach((r,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${r.year}</td><td>${r.month}</td><td>${r.penerimaan||0}</td><td>${r.pengeluaran||0}</td><td>${r.saldo||0}</td>`;const td=document.createElement('td');const del=document.createElement('button');del.textContent='Hapus';del.className='btn mini';del.onclick=()=>{if(confirm('Hapus data?')){arr.splice(i,1);writeJSON(KEU,arr);renderKeu();saveSnapshot()}};td.appendChild(del);tr.appendChild(td);b.appendChild(tr)});
+    arr.forEach((r,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${r.year}</td><td>${r.month}</td><td>${(r.penerimaan||0).toLocaleString('id-ID')}</td><td>${(r.pengeluaran||0).toLocaleString('id-ID')}</td><td>${(r.saldo||0).toLocaleString('id-ID')}</td>`;
+      const td=document.createElement('td');
+      const del=document.createElement('button');del.textContent='🗑️';del.className='btn mini';
+      del.onclick=()=>{if(confirm('Hapus data?')){arr.splice(i,1);writeJSON(KEU,arr);renderKeu();saveSnapshot()}};
+      td.appendChild(del);tr.appendChild(td);b.appendChild(tr)
+    });
     tbl.appendChild(b);wrap.appendChild(tbl);
   }
   $('keuTableWrap').innerHTML='';$('keuTableWrap').appendChild(wrap);
@@ -164,31 +540,68 @@ function renderKeu(){
 $('btnAddKeu').onclick=()=>{
   const y=$('kYear').value.trim(),m=$('kMonth').value.trim(),p=parseInt($('kP').value.trim()||0),q=parseInt($('kQ').value.trim()||0),s=parseInt($('kSaldo').value.trim()||0);
   if(!y){showSmall('Isi tahun');return}
-  const arr=readJSON(KEU,[]);arr.push({year:y,month:m||'01',penerimaan:p,pengeluaran:q,saldo:s});writeJSON(KEU,arr);$('kYear').value='';$('kMonth').value='';$('kP').value='';$('kQ').value='';$('kSaldo').value='';renderKeu();saveSnapshot();
+  const arr=readJSON(KEU,[]);arr.push({year:y,month:m||'01',penerimaan:p,pengeluaran:q,saldo:s});writeJSON(KEU,arr);$('kYear').value='';$('kMonth').value='';$('kP').value='';$('kQ').value='';$('kSaldo').value='';renderKeu();saveSnapshot();showSmall('✅ Data keuangan ditambahkan');
 };
 
-/* --- city lookup from MyQuran --- */
+/* --- city lookup --- */
 async function lookupCity(){
   const q=$('myqCityId').value.trim(); if(!q){showSmall('Isi ID kota'); return}
   try{
-    const r=await fetch('https://api.myquran.com/v2/sholat/kota/semua'); if(!r.ok) throw 0;
-    const j=await r.json(); const found=j.data.find(x=>String(x.id)==String(q)||String(x.id)==(''+parseInt(q||0))); if(found){$('cityName').textContent=found.lokasi}else{$('cityName').textContent='ID tidak ditemukan (list di '+document.getElementById('linkKota').href+')'}
-  }catch(e){$('cityName').textContent='Gagal ambil daftar kota'; console.warn(e)}
+    $('cityName').textContent='Loading...';
+    const r=await fetch('https://api.myquran.com/v2/sholat/kota/semua'); 
+    if(!r.ok) throw 0;
+    const j=await r.json(); 
+    const found=j.data.find(x=>String(x.id)==String(q)||String(x.id)==(''+parseInt(q||0))); 
+    if(found){
+      $('cityName').textContent='✓ '+found.lokasi;
+      $('cityName').style.color='var(--accent)';
+    }else{
+      $('cityName').textContent='❌ ID tidak ditemukan';
+      $('cityName').style.color='#ef4444';
+    }
+  }catch(e){
+    $('cityName').textContent='⚠ Gagal ambil daftar kota';
+    $('cityName').style.color='#f59e0b';
+    console.warn(e)
+  }
 }
 $('btnLookupCity').onclick=lookupCity;
 
-/* --- build final JSON payload --- */
+/* --- build final JSON --- */
 function buildObj(){
-  const meta={name:($('name').value.trim()||'Masjid'),addr:$('addr').value.trim()||'',lat:($('lat').value.trim()||null),lon:($('lon').value.trim()||null),myqCityId:parseInt($('myqCityId').value.trim()||'0')||703};
+  const meta={
+    name:($('name').value.trim()||'Masjid'),
+    addr:$('addr').value.trim()||'',
+    lat:($('lat').value.trim()||null),
+    lon:($('lon').value.trim()||null),
+    myqCityId:parseInt($('myqCityId').value.trim()||'0')||703
+  };
   const slides=readJSON(SL,[]);
   const rt=readJSON(RT,[]);
   const keuangan=readJSON(KEU,[]);
-  const offsets={Fajr:parseInt($('offFajr').value||0),Dhuhr:parseInt($('offDhuhr').value||0),Asr:parseInt($('offAsr').value||0),Maghrib:parseInt($('offMaghrib').value||0),Isha:parseInt($('offIsha').value||0)};
-  const iqamah={Fajr:parseInt($('iqamahFajr').value||0),Dhuhr:parseInt($('iqamahDhuhr').value||0),Asr:parseInt($('iqamahAsr').value||0),Maghrib:parseInt($('iqamahMaghrib').value||0),Isha:parseInt($('iqamahIsha').value||0)};
+  const offsets={
+    Fajr:parseInt($('offFajr').value||0),
+    Dhuhr:parseInt($('offDhuhr').value||0),
+    Asr:parseInt($('offAsr').value||0),
+    Maghrib:parseInt($('offMaghrib').value||0),
+    Isha:parseInt($('offIsha').value||0)
+  };
+  const iqamah={
+    Fajr:parseInt($('iqamahFajr').value||0),
+    Dhuhr:parseInt($('iqamahDhuhr').value||0),
+    Asr:parseInt($('iqamahAsr').value||0),
+    Maghrib:parseInt($('iqamahMaghrib').value||0),
+    Isha:parseInt($('iqamahIsha').value||0)
+  };
   const notify={notifySeconds:parseInt($('defaultAdzanBeep').value||240),startedMinutes:10};
   const auth={token:$('authToken').value.trim()||'',ts:Date.now()};
   const rtObj = {content: rt.length?rt:['Selamat datang di Masjid']};
-  const payload={meta,slides,rt:rtObj,offsets,iqamah,notify,keuangan,keuangan_meta:{hadist:($('keuHadist')?$('keuHadist').value.trim():'')},auth,message:`Update jammasjid via generator ${new Date().toISOString()}`};
+  const payload={
+    meta,slides,rt:rtObj,offsets,iqamah,notify,keuangan,
+    keuangan_meta:{hadist:($('keuHadist')?$('keuHadist').value.trim():'')},
+    auth,
+    message:`Update jammasjid via generator ${new Date().toISOString()}`
+  };
   return payload;
 }
 
@@ -200,70 +613,174 @@ function openJson(){
     const url=URL.createObjectURL(blob);
     window.open(url,'_blank');
     setTimeout(()=>URL.revokeObjectURL(url),6000);
-  }catch(e){console.error(e);showSmall('Gagal tampilkan JSON')}
+    showSmall('✅ JSON dibuka di tab baru');
+  }catch(e){console.error(e);showSmall('❌ Gagal tampilkan JSON')}
 }
-$('btnShowJson').onclick=openJson;$('btnQuickJson').onclick=openJson;
+$('btnShowJson').onclick=openJson;
+$('btnQuickJson').onclick=openJson;
 
-/* --- Netlify push --- */
+/* --- Netlify push dengan loading state --- */
 async function pushToGit(){
+  const btn = $('btnPush');
+  const originalText = btn.textContent;
+  
   try{
+    // Show loading
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Mengirim...';
     updateStatus('Mempersiapkan JSON...');
+    
     const j=buildObj();
     const path='jammasjid_backup_'+(new Date()).toISOString().slice(0,10)+'.json';
     const body={path,content:JSON.stringify(j),message:'Update jammasjid via generator'};
+    
     updateStatus('Mengirim ke Netlify function...');
     const secret = localStorage.getItem('PUSH_SECRET')||'';
-    const r = await fetch('/.netlify/functions/pushJson',{method:'POST',headers:{'content-type':'application/json','x-push-secret':secret||''},body:JSON.stringify(body)});
+    const r = await fetch('/.netlify/functions/pushJson',{
+      method:'POST',
+      headers:{
+        'content-type':'application/json',
+        'x-push-secret':secret||''
+      },
+      body:JSON.stringify(body)
+    });
+    
     const text = await r.text();
-    let parsed; try{parsed=JSON.parse(text)}catch{}
+    let parsed; 
+    try{parsed=JSON.parse(text)}catch{}
+    
     if(!r.ok){
       const msg=(parsed&&parsed.error)?(parsed.error+(parsed.details?(' - '+JSON.stringify(parsed.details)):'')):text||('HTTP '+r.status);
       throw new Error(msg);
     }
-    updateStatus('Push sukses');
-    showModal('Push sukses: OK');
-    // log to GAS that a push happened
-    try{ const auth=getSavedAuth(); if(auth && auth.token) logGAS({token:auth.token, name:getMetaName(), location:getMetaAddr(), status:'PUSH'}); }catch(e){}
+    
+    // Success!
+    updateStatus('✅ Push sukses!');
+    showModal('✅ Push berhasil ke GitHub!',3000);
+    btn.classList.add('success');
+    btn.textContent = '✅ Berhasil!';
+    
+    // Reset after 3s
+    setTimeout(()=>{
+      btn.classList.remove('success');
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }, 3000);
+    
+    // log to GAS
+    try{ 
+      const auth=getSavedAuth(); 
+      if(auth && auth.token) logGAS({token:auth.token, name:getMetaName(), location:getMetaAddr(), status:'PUSH'}); 
+    }catch(e){}
+    
     return parsed||text;
-  }catch(e){console.error(e);updateStatus('Push error');showModal('Push error: '+(e.message||e).toString(),4000);throw e}
+  }catch(e){
+    console.error(e);
+    updateStatus('❌ Push error');
+    showModal('❌ Push error: '+(e.message||e).toString(),4000);
+    btn.textContent = originalText;
+    btn.disabled = false;
+    throw e;
+  }
 }
-$('btnPush').onclick=()=>{ if(!confirm('Yakin mau push ke GitHub?')) return; pushToGit().catch(()=>{}); };
+$('btnPush').onclick=()=>{ 
+  if(!confirm('Yakin mau push ke GitHub?')) return; 
+  pushToGit().catch(()=>{}); 
+};
 
-/* send WA helper */
-$('btnSendWA').onclick=()=>{try{const j=buildObj();const raw=encodeURIComponent(JSON.stringify(j));window.open('https://wa.me/?text='+raw,'_blank')}catch(e){showSmall('Gagal kirim WA')}}; 
+/* send WA */
+$('btnSendWA').onclick=()=>{
+  try{
+    const j=buildObj();
+    const raw=encodeURIComponent(JSON.stringify(j));
+    window.open('https://wa.me/?text='+raw,'_blank');
+    showSmall('✅ Dibuka di WhatsApp');
+  }catch(e){showSmall('❌ Gagal kirim WA')}
+}; 
 
-/* push secret modal logic */
+/* push secret modal */
 $('btnSetPushSecret').onclick=()=>$('modalSecret').style.display='flex';
 $('btnSetPushSecretFixed').onclick=()=>$('modalSecret').style.display='flex';
 $('pushSecretCancel').onclick=()=>$('modalSecret').style.display='none';
-$('pushSecretSave').onclick=()=>{const v=$('pushSecretInput').value.trim(); if(!v){alert('Isi secret dulu');return} localStorage.setItem('PUSH_SECRET',v); $('modalSecret').style.display='none'; showSmall('Secret tersimpan'); $('btnSetPushSecret').style.display='inline-block'; $('btnSetPushSecretFixed').style.display='inline-block'; };
+$('pushSecretSave').onclick=()=>{
+  const v=$('pushSecretInput').value.trim(); 
+  if(!v){alert('Isi secret dulu');return} 
+  localStorage.setItem('PUSH_SECRET',v); 
+  $('modalSecret').style.display='none'; 
+  showSmall('✅ Secret tersimpan'); 
+  $('btnSetPushSecret').style.display='inline-block'; 
+  $('btnSetPushSecretFixed').style.display='inline-block';
+};
 
-/* UI state: show push secret buttons if localstorage has secret */
-(function(){ if(localStorage.getItem('PUSH_SECRET')){ $('btnSetPushSecret').style.display='inline-block'; $('btnSetPushSecretFixed').style.display='inline-block'; } else { $('btnSetPushSecret').style.display='inline-block'; $('btnSetPushSecretFixed').style.display='inline-block'; } })();
+/* Show push secret buttons if exists */
+(function(){ 
+  if(localStorage.getItem('PUSH_SECRET')){ 
+    $('btnSetPushSecret').style.display='inline-block'; 
+    $('btnSetPushSecretFixed').style.display='inline-block'; 
+  } else { 
+    $('btnSetPushSecret').style.display='inline-block'; 
+    $('btnSetPushSecretFixed').style.display='inline-block'; 
+  } 
+})();
 
-/* status update helper */
+/* status update */
 function updateStatus(t){$('status').textContent=t}
 
-/* autosave snapshot of form + arrays */
-function saveSnapshot(){ try{ const snap={meta:{name:$('name').value,addr:$('addr').value,lat:$('lat').value,lon:$('lon').value,myqCityId:$('myqCityId').value},slides:readJSON(SL,[]),rt:readJSON(RT,[]),keuangan:readJSON(KEU,[]),offsets:{Fajr:$('offFajr').value,Dhuhr:$('offDhuhr').value,Asr:$('offAsr').value,Maghrib:$('offMaghrib').value,Isha:$('offIsha').value},iqamah:{Fajr:$('iqamahFajr').value,Dhuhr:$('iqamahDhuhr').value,Asr:$('iqamahAsr').value,Maghrib:$('iqamahMaghrib').value,Isha:$('iqamahIsha').value},notify:{notifySeconds:$('defaultAdzanBeep').value},auth:{token:$('authToken').value}}; localStorage.setItem(K,JSON.stringify(snap)); }catch(e){} }
+/* autosave */
+function saveSnapshot(){ 
+  try{ 
+    const snap={
+      meta:{name:$('name').value,addr:$('addr').value,lat:$('lat').value,lon:$('lon').value,myqCityId:$('myqCityId').value},
+      slides:readJSON(SL,[]),
+      rt:readJSON(RT,[]),
+      keuangan:readJSON(KEU,[]),
+      offsets:{Fajr:$('offFajr').value,Dhuhr:$('offDhuhr').value,Asr:$('offAsr').value,Maghrib:$('offMaghrib').value,Isha:$('offIsha').value},
+      iqamah:{Fajr:$('iqamahFajr').value,Dhuhr:$('iqamahDhuhr').value,Asr:$('iqamahAsr').value,Maghrib:$('iqamahMaghrib').value,Isha:$('iqamahIsha').value},
+      notify:{notifySeconds:$('defaultAdzanBeep').value},
+      auth:{token:$('authToken').value}
+    }; 
+    localStorage.setItem(K,JSON.stringify(snap)); 
+  }catch(e){} 
+}
 setInterval(()=>{ try{ saveSnapshot(); }catch(e){} },3000);
 
-/* load snapshot on boot */
-(function(){ try{ const s=localStorage.getItem(K); if(s){ const o=JSON.parse(s); if(o.meta){ $('name').value=o.meta.name||''; $('addr').value=o.meta.addr||''; $('lat').value=o.meta.lat||''; $('lon').value=o.meta.lon||''; $('myqCityId').value=o.meta.myqCityId||'';} if(o.notify && o.notify.notifySeconds) $('defaultAdzanBeep').value=o.notify.notifySeconds; if(o.offsets){ $('offFajr').value=o.offsets.Fajr||0; $('offDhuhr').value=o.offsets.Dhuhr||0; $('offAsr').value=o.offsets.Asr||0; $('offMaghrib').value=o.offsets.Maghrib||0; $('offIsha').value=o.offsets.Isha||0;} if(o.iqamah){ $('iqamahFajr').value=o.iqamah.Fajr||0; $('iqamahDhuhr').value=o.iqamah.Dhuhr||0; $('iqamahAsr').value=o.iqamah.Asr||0; $('iqamahMaghrib').value=o.iqamah.Maghrib||0; $('iqamahIsha').value=o.iqamah.Isha||0;} if(o.auth) $('authToken').value=o.auth.token||'';} }catch(e){console.warn(e)} })();
+/* load snapshot */
+(function(){ 
+  try{ 
+    const s=localStorage.getItem(K); 
+    if(s){ 
+      const o=JSON.parse(s); 
+      if(o.meta){ 
+        $('name').value=o.meta.name||''; 
+        $('addr').value=o.meta.addr||''; 
+        $('lat').value=o.meta.lat||''; 
+        $('lon').value=o.meta.lon||''; 
+        $('myqCityId').value=o.meta.myqCityId||'';
+      } 
+      if(o.notify && o.notify.notifySeconds) $('defaultAdzanBeep').value=o.notify.notifySeconds; 
+      if(o.offsets){ 
+        $('offFajr').value=o.offsets.Fajr||0; 
+        $('offDhuhr').value=o.offsets.Dhuhr||0; 
+        $('offAsr').value=o.offsets.Asr||0; 
+        $('offMaghrib').value=o.offsets.Maghrib||0; 
+        $('offIsha').value=o.offsets.Isha||0;
+      } 
+      if(o.iqamah){ 
+        $('iqamahFajr').value=o.iqamah.Fajr||0; 
+        $('iqamahDhuhr').value=o.iqamah.Dhuhr||0; 
+        $('iqamahAsr').value=o.iqamah.Asr||0; 
+        $('iqamahMaghrib').value=o.iqamah.Maghrib||0; 
+        $('iqamahIsha').value=o.iqamah.Isha||0;
+      } 
+      if(o.auth) $('authToken').value=o.auth.token||'';
+    } 
+  }catch(e){console.warn(e)} 
+})();
 
-/* initial render from stored arrays */
+/* initial render */
 (function(){ renderRT(); renderSlides(); renderKeu(); })();
 
-/* helper: try OPTIONS to detect function (not required) */
-(async function(){ try{const r=await fetch('/.netlify/functions/pushJson',{method:'OPTIONS'}); if(!r.ok) console.log('OPTIONS not allowed or function missing'); }catch(e){console.log('function options err',e)} })();
-
-/* -------------------------
-   LOGGING TO GOOGLE APPS SCRIPT (GAS)
-   - saves token locally (AUTH_KEY)
-   - validates token against remote valid-tokens.json (best-effort)
-   - calls GAS URL (GET) and fallback no-cors if needed
-   -------------------------*/
-
+/* --- GAS LOGGING --- */
 async function fetchValidTokens(){
   try{
     const r = await fetch(VALID_TOKENS_URL,{cache:'no-store'});
@@ -273,85 +790,68 @@ async function fetchValidTokens(){
   }catch(e){ return null; }
 }
 
-// core logGAS: best-effort, first try normal GET (to read response), else fallback no-cors
 async function logGAS(obj){
   try{
     if(!obj || !obj.token) return;
     const params = new URLSearchParams({ token: obj.token, name: obj.name||'', location: obj.location||obj.loc||'', status: obj.status||'OK' }).toString();
     const url = GAS_URL + '?' + params;
-    // try normal fetch
     try{
       const res = await fetch(url, { method:'GET', cache:'no-store' });
       if(res && res.ok){
         try{ const j = await res.json(); console.log('logGAS ok', j); }catch(e){ console.log('logGAS ok (no json)'); }
         return;
       }
-    }catch(e){
-      // console.warn('normal fetch to GAS failed', e);
-    }
-    // fallback fire-and-forget (no-cors)
-    try{ await fetch(url, { method:'GET', mode:'no-cors', cache:'no-store' }); }catch(e){ /* ignore */ }
+    }catch(e){}
+    try{ await fetch(url, { method:'GET', mode:'no-cors', cache:'no-store' }); }catch(e){}
   }catch(e){ console.warn('logGAS final error', e); }
 }
 
-// helper to get saved auth
 function getSavedAuth(){ try{ const s = localStorage.getItem(AUTH_KEY); if(!s) return null; return JSON.parse(s); }catch{return null} }
-// save auth locally and optionally validate
+
 async function saveAuthToken(token){
   try{
     const t = (token||'').toString().trim().toUpperCase();
     if(!t){ localStorage.removeItem(AUTH_KEY); return false; }
     const authObj = { token: t, savedAt: Date.now() };
     localStorage.setItem(AUTH_KEY, JSON.stringify(authObj));
-    // try to validate against remote valid-tokens (best-effort)
     const tokens = await fetchValidTokens();
     const valid = Array.isArray(tokens) ? tokens.includes(t) : null;
-    if(valid===true) { console.log('token validated against valid-tokens.json'); }
-    // log boot/ok to GAS
+    if(valid===true) { console.log('token validated'); }
     try{ logGAS({ token: t, name: getMetaName(), location: getMetaAddr(), status: 'OK' }); }catch(e){}
     return true;
   }catch(e){console.warn(e);return false}
 }
 
-// read meta helpers for logging
 function getMetaName(){ try{ return ($('name')?.value||'').toString().trim(); }catch{return ''}}
 function getMetaAddr(){ try{ return ($('addr')?.value||'').toString().trim(); }catch{return ''}}
 
-// listen to authToken changes -> save locally & log
 (function(){
   const el = $('authToken');
   if(!el) return;
-  // on blur or Enter key -> save
   el.addEventListener('blur', ()=>{ const v = el.value.trim(); if(v) saveAuthToken(v); });
-  el.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); const v = el.value.trim(); if(v) saveAuthToken(v); el.blur(); showSmall('Token disimpan lokal'); }});
-  // on input, autosave (throttled)
+  el.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); const v = el.value.trim(); if(v) saveAuthToken(v); el.blur(); showSmall('✅ Token disimpan lokal'); }});
   let timer=null;
   el.addEventListener('input', ()=>{ if(timer) clearTimeout(timer); timer=setTimeout(()=>{ const v=el.value.trim(); if(v) saveAuthToken(v); timer=null; },1000); });
 })();
 
-// on boot, if saved auth present, call logGAS and start heartbeat
 (async function bootAuthAndHeartbeat(){
   try{
     const auth = getSavedAuth();
     if(auth && auth.token){
-      // set input
       if($('authToken')) $('authToken').value = auth.token;
-      // fire boot log
       try{ await logGAS({ token: auth.token, name: getMetaName(), location: getMetaAddr(), status: 'BOOT' }); }catch(e){}
     }
-    // heartbeat every 10 minutes to indicate active
     setInterval(()=>{ try{ const a=getSavedAuth(); if(a && a.token) logGAS({ token: a.token, name: getMetaName(), location: getMetaAddr(), status: 'PING' }); }catch(e){} }, 10*60*1000);
   }catch(e){ console.warn('bootAuthAndHeartbeat', e) }
 })();
 
-/* expose small function to let user force-save token (useful from console) */
-window._jg = window._jg || {}; window._jg.saveAuthToken = saveAuthToken; window._jg.getSavedAuth = getSavedAuth;
-
-/* End logging additions */
-
-/* initial debug / detection */
-window._jg = window._jg || {}; window._jg.buildObj = buildObj; window._jg.renderSlides = renderSlides; window._jg.renderRT = renderRT; window._jg.renderKeu = renderKeu; window._jg.saveSnapshot = saveSnapshot;
-
-/* End of script */
+window._jg = window._jg || {}; 
+window._jg.saveAuthToken = saveAuthToken; 
+window._jg.getSavedAuth = getSavedAuth;
+window._jg.buildObj = buildObj; 
+window._jg.renderSlides = renderSlides; 
+window._jg.renderRT = renderRT; 
+window._jg.renderKeu = renderKeu; 
+window._jg.saveSnapshot = saveSnapshot;
 </script>
 </body></html>
